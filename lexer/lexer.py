@@ -1,5 +1,7 @@
 from enum import Enum
 import sys
+from myParser.parserv2 import Parser,TokenType,Token
+
 class States(Enum):
     eof = -1
     initial = 0
@@ -25,8 +27,7 @@ class Lexer:
         print("|       {:22}       |        {:15}       |  {:5}  |".format("TYPE", "VALUE","LINE"))
         print("-------------------------------------------------------------------------------".format("TYPE", "VALUE", "LINE"))
         for Token in self.tokenList:
-            if not(Token is None):
-                Token.print()
+            Token.print()
 
     def isEof(self):
         if self.position == self.getLenght():
@@ -34,6 +35,9 @@ class Lexer:
         else:
             return False
 
+    def printError(self,message):
+        print("{}.meme:{}:error:{}".format(sys.argv[1], self.line + 1,message),file=sys.stderr)    
+    
     def getChar(self):
         return self.inputstring[self.position]
 
@@ -56,6 +60,7 @@ class Lexer:
     def run(self):
         while not self.isEof():
             self.parse()
+        self.tokenList.append(self.reof())
 
     def parse(self):
         if self.position == len(self.inputstring):
@@ -72,24 +77,37 @@ class Lexer:
             self.tokenList.append(self.roperator())
             self.tempString = ""
         elif self.isParenthesis():
-            if self.currentState == States.parenthesis:
-                self.tokenList.append(self.rparenthesis())
-        elif self.position == len(self.inputstring):
-            self.tokenList.append(self.reof())
+            self.tokenList.append(self.rparenthesis())
+        elif self.isBraces():
+            self.tokenList.append(self.rbraces())
+        elif self.isBrackets():
+            self.tokenList.append(self.rbrackets())
+        elif self.isComma():
+            self.tokenList.append(self.rcomma())
         
     def isIdent(self):
         if self.getChar().isalpha():
             return True
         else:
             return False
-    
+
+    def isComma(self):
+        if self.getChar() == ",":
+            return True
+
     def isParenthesis(self):
         if self.getChar() == "(" or self.getChar() == ")":
+            return True
+    def isBrackets(self):
+        if self.getChar() == "[" or self.getChar() == "]":
+            return True
+    def isBraces(self):
+        if self.getChar() == "{" or self.getChar() == "}":
             return True
             
     def isWhiteSpace(self):
         if self.checkLenght() and self.inputstring[self.position] == "\n":
-            self.rnewline()
+            self.tokenList.append(self.rnewline())
             return True
         if self.checkLenght() and self.inputstring[self.position] == " ":
             self.rspace()
@@ -110,6 +128,11 @@ class Lexer:
     def reof(self):
         return Token(TokenType.endOfFile,"",self.line)
 
+    def rcomma(self):
+        if self.getChar() == ",":
+            self.indentPosition()
+            return Token(TokenType.comma,"",self.line)
+
     def rparenthesis(self):
         if self.getChar() == "(":
             self.indentPosition()
@@ -117,7 +140,22 @@ class Lexer:
         if self.getChar() == ")":
             self.indentPosition()
             return Token(TokenType.rightParenthesis,"",self.line)
-            
+    def rbrackets(self):
+        if self.getChar() == "[":
+            self.indentPosition()
+            return Token(TokenType.leftBracket,"",self.line)
+        if self.getChar() == "]":
+            self.indentPosition()
+            return Token(TokenType.rightBracket,"",self.line)
+
+    def rbraces(self):
+        if self.getChar() == "{":
+            self.indentPosition()
+            return Token(TokenType.leftBrace, "", self.line)
+        if self.getChar() == "}":
+            self.indentPosition()
+            return Token(TokenType.rightBrace, "", self.line)
+
     def rcomment(self):
         commentString = ""
         try:
@@ -129,7 +167,7 @@ class Lexer:
                 if "comment_end" in commentString:
                     break
         except IndexError:
-            print("{}.meme:{}:error:NO TERMINATING SYMBOL".format(sys.argv[1], self.line + 1))
+            self.printError("NO COMMENT TERMINATION FOUND")
 
     def roperator(self):
         if self.getChar() == "<":
@@ -150,7 +188,7 @@ class Lexer:
                 self.appendToString()
                 return Token(TokenType.notEqual,"",self.line)
             return Token(TokenType.notSomething, "", self.line)
-        if  self.getChar() == "=":
+        if self.getChar() == "=":
             self.appendToString()
             if self.checkLenght() and self.getChar() == "=":
                 self.appendToString()
@@ -180,40 +218,46 @@ class Lexer:
                 return self.rint()
 
     def rstring(self):
-                self.indentPosition()
-                try:
-                    while self.getChar() != "\"":
-                        if self.getChar() == "~":
-                            self.appendToString()
-                            self.appendToString()
-                        else:
-                            self.appendToString()
-                except IndexError:
-                    print("{}.meme:{}:error:NO TERMINATING SYMBOL".format(sys.argv[1], self.line + 1))
+        esq =""
+        self.indentPosition()
+        try:
+            while self.getChar() != "\"":
+                if self.getChar() == "~":
+                    esq += self.getChar()
+                    self.appendToString()
+                    esq += self.getChar()
+                    if esq not in self.escapeSeq:
+                        self.printError("UNKNOWN ESCAPE SEQUENCE")
+                        sys.exit()
+                    self.appendToString()
                 else:
-                    self.indentPosition()
-                    counter = 0
-                    for x in self.tempString:
-                        if x == "~n" or x == "\n":
-                            self.indentLine()
-                            counter += 1
-                    memeString = self.tempString
-                    for x in self.escapeSeq:
-                        memeString = memeString.replace(x,self.escapeSeq[x])
-                    return Token(TokenType.stringLiteral, memeString , self.line-counter)
+                    self.appendToString()
+        except IndexError:
+            self.printError("NO STRING TERMINATION FOUND")
+        else:
+            self.indentPosition()
+            counter = 0
+            for x in self.tempString:
+                if x == "~n" or x == "\n":
+                    self.indentLine()
+                    counter += 1
+            memeString = self.tempString
+            for x in self.escapeSeq:
+                memeString = memeString.replace(x,self.escapeSeq[x])
+            return Token(TokenType.stringLiteral, memeString , self.line-counter)
 
     def rfloat(self):
         if self.getChar() == "-":
             self.appendToString()
         if not self.getChar().isdigit():
-            print("{}.meme:{}:error:UNIDENTIFIED LITERAL".format(sys.argv[1], self.line + 1))
+            self.printError("INVALID SUFFIX AFTER FLOAT")
             sys.exit()
         while self.checkLenght() and self.getChar().isdigit():
             self.appendToString()
             if self.position == self.getLenght():
                 break
             if self.getChar().isalpha() or self.getChar() == "_":
-                print("{}.meme:{}:error:UNIDENTIFIED LITERAL".format(sys.argv[1], self.line + 1))
+                self.printError("INVALID SUFFIX AFTER FLOAT")
                 sys.exit()
         return Token(TokenType.floatLiteral, self.tempString,self.line)
 
@@ -227,7 +271,7 @@ class Lexer:
                 self.appendToString()
                 return self.rfloat()
             if self.getChar().isalpha() or self.getChar() == "_":
-                print("{}.meme:{}:error:UNIDENTIFIED LITERAL".format(sys.argv[1], self.line + 1))
+                self.printError("INVALID SUFFIX AFTER INTEGER")
                 sys.exit()
         return Token(TokenType.integerLiteral, self.tempString, self.line)
 
@@ -259,51 +303,6 @@ class Lexer:
         self.indentPosition()
 
 
-class Token:
-    def __init__(self, type, value, line):
-        self.type = type
-        self.value = value
-        self.line = line
-
-    def print(self):
-        print("|       {:22}       |        {:15}       |{:5}    |".format(self.type.upper(),self.value,self.line+1))
-
-
-class TokenType:
-
-    identifier = "IDENTIFIER"
-    number = "number"
-    keyword = "keyword"
-    operator = "operator"
-    integerType = "type_integer"
-    doubleType = "type_double"
-    stringType = "type_string"
-    characterType = "type_character"
-    integerLiteral = "int_lit"
-    booleanLiteral = "bool_lit"
-    stringLiteral = "string_lit"
-    floatLiteral = "float_lit"
-    logicalAnd = "logical_and_op"
-    logicalOr = "logical_or_op"
-    plus = "plus"
-    minus = "minus"
-    mult = "multiplication"
-    div = "division"
-    greaterThan = "greater_than"
-    greaterThanOrEqual = "greater_than_or_equal"
-    lessThan = "less_than"
-    lessThanOrEqual = "less_than_or_equal"
-    equal = "equal"
-    notSomething = "not"
-    notEqual = "not_equal"
-    assign = "assignment"
-    leftParenthesis = "left_parenthesis"
-    rightParenthesis = "right_parenthesis"
-    newLine = "new_line"
-    endOfFile = "end_of_file"
-    commentStart = "comment_start"
-    commentEnd = "comment_end"
-
 try:
     with open("{}.meme".format(str(sys.argv[1])), "r") as file:
         string = file.read()
@@ -314,7 +313,7 @@ with open ("keywords.txt", "r") as file:
     keywordList = file.read().split(",")
 with open ("operators.txt", "r") as file:
     operatorList = file.read().split(",")
-
 lexer = Lexer(string, keywordList, operatorList)
 lexer.run()
-lexer.printTokens()
+parser = Parser(lexer.tokenList)
+parser.parse_functions().print()
