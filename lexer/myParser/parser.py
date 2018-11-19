@@ -111,3 +111,21 @@ class StmtIf(Stmt):
 class StmtBreak(Stmt):
     def print(self):
         print("break")
+
+class StmtWhile(Stmt):
+    def __init__(self, cond, body):
+        self.cond = cond
+        self.body = body
+
+    def print(self):
+        print(self.cond)
+        print(self.body)
+
+class ExprBinary(Node):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def print(self):
+        print(self.left)
+        print(self.right)

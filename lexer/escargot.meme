@@ -1,6 +1,4 @@
 define integer meme(integer a, string meme)[
-    return
-]
-define string meme2(integer b, string duxas)[
-    break
+    return estrogen
+    10
 ]

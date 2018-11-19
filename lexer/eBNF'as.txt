@@ -56,7 +56,7 @@ BNF'as
 
 <jump_stmt> ::= "return" <expression> | "break" | "continue" | "return"
 
-<loop_stmt> ::= "while" "("<expression>")" "{"<stmts> <newlines> "end"
+<loop_stmt> ::= "while" "("<expression>")" "then" <stmts> <newlines> "end"
 
 <stmt> ::= <declaration_stmt> | <assignment_stmt> | <jump_stmt> | <if_stmt> | <loop_stmt> | <initialization_stmt>
 <stmts> ::= <stmt><newlines>{<stmt> <newlines>} 

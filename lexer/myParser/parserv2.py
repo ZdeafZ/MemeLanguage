@@ -92,7 +92,8 @@ class Parser:
         node = Functions()
         while self.currentToken().type is not TokenType.endOfFile:
             self.expect(TokenType.keyword)
-            node.appendFunction(self.parse_function())
+            temp = self.parse_function()
+            node.appendFunction(temp)
             self.expect(TokenType.newLine)
         return node
 
@@ -105,6 +106,8 @@ class Parser:
         elif result.value == "boolean":
             return Type(result)
         elif result.value == "float":
+            return Type(result)
+        elif result.value == "character":
             return Type(result)
 
     def parse_ident(self):
@@ -137,14 +140,16 @@ class Parser:
             return self.parse_body()
         elif self.currentToken().type == TokenType.keyword:
             if self.currentToken().value == "if":
-                return Stmt()
+                return self.parse_if_stmt()
             elif self.currentToken().value == "return":
                 return self.parse_return_stmt()
             elif self.currentToken().value == "break":
                 self.expect(TokenType.keyword)
                 return StmtBreak()
             elif self.currentToken().value == "while":
-                return Stmt()
+                return self.parse_while_stmt()
+        else:
+            return self.parse_stmt_expr()
 
     def parse_return_stmt(self):
         self.expect(TokenType.keyword)
@@ -152,3 +157,54 @@ class Parser:
         if self.currentToken().type is not TokenType.newLine:
             value = self.parse_ident()
         return StmtReturn(value)
+
+    def parse_if_stmt(self):
+        self.expect(TokenType.keyword)
+        self.expect(TokenType.newLine)
+        if self.currentToken().value == "then":
+            self.expect(TokenType.keyword)
+        body = self.parse_body()
+        if self.currentToken().value == "end":
+            self.expect(TokenType.keyword)
+        return StmtIf("random for now",body)
+
+    def parse_while_stmt(self):
+        self.expect(TokenType.keyword)
+        self.expect(TokenType.newLine)
+        if self.currentToken().value == "then":
+            self.expect(TokenType.keyword)
+        body = self.parse_body()
+        if self.currentToken().value == "end":
+            self.expect(TokenType.keyword)
+        return StmtWhile("random for now",body)
+
+    def parse_priority_expr(self):
+        self.expect(TokenType.leftParenthesis)
+        expr = self.parse_expr()
+        self.expect(TokenType.rightParenthesis)
+        return ExprPriority(expr)
+
+    def parse_term_expr(self):
+        if self.currentToken().type == TokenType.identifier:
+            name = self.expect(TokenType.identifier)
+            return ExprIdent(name)
+        elif self.currentToken().type == TokenType.integerLiteral:
+            literal = self.expect(TokenType.integerLiteral)
+            return ExprConstant(literal)
+        elif self.currentToken().type == TokenType.booleanLiteral:
+            literal = self.expect(TokenType.integerLiteral)
+            return ExprConstant(literal)
+        elif self.currentToken().type == TokenType.stringLiteral:
+            literal = self.expect(TokenType.integerLiteral)
+            return ExprConstant(literal)
+        elif self.currentToken().type == TokenType.floatLiteral:
+            literal = self.expect(TokenType.integerLiteral)
+            return ExprConstant(literal)
+        elif self.currentToken().type == TokenType.leftParenthesis:
+            return self.parse_priority_expr()
+
+    def parse_stmt_expr(self):
+        expr = self.parse_term_expr()
+        return StmtExpr(expr)
+
+
