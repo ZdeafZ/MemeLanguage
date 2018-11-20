@@ -135,6 +135,20 @@ class Parser:
             self.expect(TokenType.newLine)
         return node
 
+
+    def parse_stmt_body(self):
+        node = StmtBlock()
+        self.expect(TokenType.keyword)
+        self.expect(TokenType.newLine)
+        while True:
+            if self.currentToken().value == "end":
+                break
+            node.appendStmt(self.parse_stmt())
+            self.expect(TokenType.newLine)
+        self.accept(TokenType.keyword)
+        return node
+
+
     def parse_stmt(self):
         if self.currentToken().type == TokenType.leftBracket:
             return self.parse_body()
@@ -160,23 +174,19 @@ class Parser:
 
     def parse_if_stmt(self):
         self.expect(TokenType.keyword)
+        cond = self.parse_term_expr()
         self.expect(TokenType.newLine)
         if self.currentToken().value == "then":
-            self.expect(TokenType.keyword)
-        body = self.parse_body()
-        if self.currentToken().value == "end":
-            self.expect(TokenType.keyword)
-        return StmtIf("random for now",body)
+            body = self.parse_stmt_body()
+        return StmtIf(cond, body)
 
     def parse_while_stmt(self):
         self.expect(TokenType.keyword)
+        cond = self.parse_term_expr()
         self.expect(TokenType.newLine)
         if self.currentToken().value == "then":
-            self.expect(TokenType.keyword)
-        body = self.parse_body()
-        if self.currentToken().value == "end":
-            self.expect(TokenType.keyword)
-        return StmtWhile("random for now",body)
+            body = self.parse_stmt_body()
+        return StmtWhile(cond, body)
 
     def parse_priority_expr(self):
         self.expect(TokenType.leftParenthesis)

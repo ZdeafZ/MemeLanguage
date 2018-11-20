@@ -11,10 +11,10 @@ class FuncDefinition(Node):
         self.funcbody = body
 
     def print(self):
-        print(self.type)
-        print(self.name)
-        print(self.params)
-        print(self.funcbody)
+        print("Type = {}".format(self.type))
+        print("Name = {}".format(self.name))
+        print("Args = {}".format(self.params))
+        print("Body = {}".format(self.funcbody))
 
 class Functions(Node):
 
@@ -25,7 +25,7 @@ class Functions(Node):
         self.functions.append(func)
 
     def print(self):
-        print(self.functions)
+        print("Functions = {}".format(self.functions))
 
 
 class Type(Node):
@@ -33,7 +33,7 @@ class Type(Node):
         self.type = rtype
 
     def print(self):
-        print(self.type)
+        print("Type = {}".format(self.type))
 
 class Expr(Node):
     def __init__(self, op,left,right):
@@ -51,26 +51,30 @@ class ExprPriority(Node):
         self.exprs = exprs
 
     def print(self):
-        print(self.exprs)
+        print("Expression = {}".format(self.exprs))
 
 class ExprConstant(Node):
     def __init__ (self, lit):
         self.lit = lit
 
     def print(self):
-        print(self.lit)
+        print("Literal = {}".format(self.lit))
 
 class  ExprIdent(Node):
     def __init__(self, name):
         self.name = name
 
     def print(self):
-        print(self.name)
+        print("Name = {}".format(self.name))
 
 class Arg(Node):
     def __init__(self, rtype, name):
         self.rtype = rtype
         self.name = name
+
+    def print(self):
+        print("Return type = {}".format(self.rtype))
+        print("Name = {}".format(self.name))
 
 class Stmt(Node):
     pass
@@ -83,21 +87,21 @@ class StmtBlock(Stmt):
         self.stmts.append(stmt)
 
     def print(self):
-        print(self.stmts)
+        print("Stmts = {}".format(self.stmts))
 
 class StmtExpr(Stmt):
     def __init__(self,expr):
         self.expr = expr
 
     def print(self):
-        print(self.expr)
+        print("Expression = {}".format(self.expr))
 
 class StmtReturn(Stmt):
     def __init__(self, rident):
         self.rident = rident
 
     def print(self):
-        print(self.rident)
+        print("Return Value = {}".format(self.rident))
 
 class StmtIf(Stmt):
     def __init__(self, cond, body):
@@ -105,12 +109,12 @@ class StmtIf(Stmt):
         self.body = body
 
     def print(self):
-        print(self.cond)
-        print(self.body)
+        print("Cond = {}".format(self.cond))
+        print("Body = {}".format(self.body))
 
 class StmtBreak(Stmt):
     def print(self):
-        print("break")
+        print("Break")
 
 class StmtWhile(Stmt):
     def __init__(self, cond, body):
@@ -118,8 +122,8 @@ class StmtWhile(Stmt):
         self.body = body
 
     def print(self):
-        print(self.cond)
-        print(self.body)
+        print("Cond = {}".format(self.cond))
+        print("Body = {}".format(self.body))
 
 class ExprBinary(Node):
     def __init__(self, left, right):
