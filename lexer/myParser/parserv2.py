@@ -18,10 +18,10 @@ class TokenType:
     floatLiteral = "float_lit"
     logicalAnd = "logical_and_op"
     logicalOr = "logical_or_op"
-    plus = "plus"
-    minus = "minus"
-    mult = "multiplication"
-    div = "division"
+    plus = "plus_op"
+    minus = "minus_op"
+    mult = "multiplication_op"
+    div = "division_op"
     greaterThan = "greater_than"
     greaterThanOrEqual = "greater_than_or_equal"
     lessThan = "less_than"
@@ -81,6 +81,15 @@ class Parser:
             print(" found {} expected {} at line {}".format(curr_token.type, token, curr_token.line + 1))
             sys.exit()
 
+    def expectKeyword(self,value):
+        if self.currentToken().value == value:
+            return self.expect(TokenType.keyword)
+        else:
+            curr_token = self.tokens[self.position]
+            print("error")
+            print(" found {} with value {} expected value {} at line {}".format(curr_token.type, self.currentToken().value, value, curr_token.line + 1))
+            sys.exit()
+
     def parse_function(self):
         rtype = self.parse_type()
         identifier = self.parse_ident()
@@ -129,7 +138,9 @@ class Parser:
 
     def parse_body(self):
         node = StmtBlock()
+        self.accept(TokenType.newLine)
         self.expect(TokenType.leftBracket)
+        self.expect(TokenType.newLine)
         while self.accept(TokenType.rightBracket) is None:
             node.appendStmt(self.parse_stmt())
             self.expect(TokenType.newLine)
@@ -138,14 +149,14 @@ class Parser:
 
     def parse_stmt_body(self):
         node = StmtBlock()
-        self.expect(TokenType.keyword)
+        self.expectKeyword("then")
         self.expect(TokenType.newLine)
         while True:
             if self.currentToken().value == "end":
                 break
             node.appendStmt(self.parse_stmt())
             self.expect(TokenType.newLine)
-        self.accept(TokenType.keyword)
+        self.expectKeyword("end")
         return node
 
 
@@ -166,18 +177,17 @@ class Parser:
             return self.parse_stmt_expr()
 
     def parse_return_stmt(self):
-        self.expect(TokenType.keyword)
+        self.expectKeyword("return")
         value = None
         if self.currentToken().type is not TokenType.newLine:
             value = self.parse_ident()
         return StmtReturn(value)
 
     def parse_if_stmt(self):
-        self.expect(TokenType.keyword)
+        self.expectKeyword("if")
         cond = self.parse_term_expr()
         self.expect(TokenType.newLine)
-        if self.currentToken().value == "then":
-            body = self.parse_stmt_body()
+        body = self.parse_stmt_body()
         return StmtIf(cond, body)
 
     def parse_while_stmt(self):
@@ -202,13 +212,13 @@ class Parser:
             literal = self.expect(TokenType.integerLiteral)
             return ExprConstant(literal)
         elif self.currentToken().type == TokenType.booleanLiteral:
-            literal = self.expect(TokenType.integerLiteral)
+            literal = self.expect(TokenType.booleanLiteral)
             return ExprConstant(literal)
         elif self.currentToken().type == TokenType.stringLiteral:
-            literal = self.expect(TokenType.integerLiteral)
+            literal = self.expect(TokenType.stringLiteral)
             return ExprConstant(literal)
         elif self.currentToken().type == TokenType.floatLiteral:
-            literal = self.expect(TokenType.integerLiteral)
+            literal = self.expect(TokenType.floatLiteral)
             return ExprConstant(literal)
         elif self.currentToken().type == TokenType.leftParenthesis:
             return self.parse_priority_expr()
@@ -216,5 +226,27 @@ class Parser:
     def parse_stmt_expr(self):
         expr = self.parse_term_expr()
         return StmtExpr(expr)
-
-
+        
+    def parse_logical_or_expr(self):
+        left = self.parse_term_expr()
+        while self.accept(TokenType.newLine) is None:
+            op = self.expectKeyword("or")
+            right = self.parse_term_expr()
+            left = ExprLogicalOr(left,op,right)
+        return left
+    
+    def parse_logical_and_expr(self):
+        left = self.parse_term_expr()
+        while self.accept(TokenType.newLine) is None:
+            op = self.expectKeyword("and")
+            right = self.parse_term_expr()
+            left = ExprLogicalAnd(left,op,right)
+        return left
+        
+    def parse_comparsion_expr(self):
+        left = self.parse_term_expr()
+        while self.accept(TokenType.newLine) is None:
+            op = self.expect(TokenType.greaterThan)
+            right = self.parse_term_expr()
+            left = ExprComparsion(left,op,right)
+        return left

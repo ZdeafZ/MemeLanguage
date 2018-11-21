@@ -1,6 +1,6 @@
-define integer meme(integer a, string meme)[
-    if ermagerd
+define integer meme(integer a, string meme)
+[
+    if fagoo
     then
-        return omegalul
     end
 ]

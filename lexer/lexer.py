@@ -1,6 +1,7 @@
 from enum import Enum
 import sys
 from myParser.parserv2 import Parser,TokenType,Token
+from myAstPrinter.astPrinter import ASTPrinter
 
 class States(Enum):
     eof = -1
@@ -314,6 +315,8 @@ with open ("keywords.txt", "r") as file:
 with open ("operators.txt", "r") as file:
     operatorList = file.read().split(",")
 lexer = Lexer(string, keywordList, operatorList)
-lexer.run()
+lexer.run() 
 parser = Parser(lexer.tokenList)
-parser.parse_functions().print()
+result = parser.parse_functions()
+printer = ASTPrinter()
+result.print(printer)
