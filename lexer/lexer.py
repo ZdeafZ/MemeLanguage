@@ -315,7 +315,7 @@ with open ("keywords.txt", "r") as file:
 with open ("operators.txt", "r") as file:
     operatorList = file.read().split(",")
 lexer = Lexer(string, keywordList, operatorList)
-lexer.run() 
+lexer.run()
 parser = Parser(lexer.tokenList)
 result = parser.parse_functions()
 printer = ASTPrinter()

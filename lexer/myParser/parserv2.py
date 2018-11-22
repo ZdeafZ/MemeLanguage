@@ -194,6 +194,7 @@ class Parser:
         self.expect(TokenType.keyword)
         cond = self.parse_term_expr()
         self.expect(TokenType.newLine)
+        body = None
         if self.currentToken().value == "then":
             body = self.parse_stmt_body()
         return StmtWhile(cond, body)
@@ -224,29 +225,26 @@ class Parser:
             return self.parse_priority_expr()
 
     def parse_stmt_expr(self):
-        expr = self.parse_term_expr()
+        expr = self.parse_logical_or_expr()
         return StmtExpr(expr)
         
     def parse_logical_or_expr(self):
-        left = self.parse_term_expr()
-        while self.accept(TokenType.newLine) is None:
-            op = self.expectKeyword("or")
-            right = self.parse_term_expr()
-            left = ExprLogicalOr(left,op,right)
+        left = self.parse_logical_and_expr()
+        while self.accept(TokenType.logicalOr) is not None:
+            right = self.parse_logical_and_expr()
+            left = ExprLogicalOr(left,"meme",right)
         return left
     
     def parse_logical_and_expr(self):
-        left = self.parse_term_expr()
-        while self.accept(TokenType.newLine) is None:
-            op = self.expectKeyword("and")
-            right = self.parse_term_expr()
-            left = ExprLogicalAnd(left,op,right)
+        left = self.parse_comparsion_expr()
+        while self.accept(TokenType.logicalAnd) is not None:
+            right = self.parse_comparsion_expr()
+            left = ExprLogicalAnd(left,"even more meme", right)
         return left
         
     def parse_comparsion_expr(self):
         left = self.parse_term_expr()
-        while self.accept(TokenType.newLine) is None:
-            op = self.expect(TokenType.greaterThan)
+        while self.accept(TokenType.greaterThan):
             right = self.parse_term_expr()
-            left = ExprComparsion(left,op,right)
+            left = ExprComparsion(left,"more meme",right)
         return left

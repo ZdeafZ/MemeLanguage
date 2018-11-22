@@ -1,6 +1,4 @@
-define integer meme(integer a, string meme)
+define integer meme(integer a)
 [
-]
-define string eskettit()
-[
+    lmao and meme
 ]
