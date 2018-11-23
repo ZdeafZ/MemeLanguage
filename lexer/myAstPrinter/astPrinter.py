@@ -9,7 +9,9 @@ class ASTPrinter:
         elif type(value) is Token:
             print("    "*self.indent + "{}  {}  {}  {}".format(name,value.__class__.__name__, value.type, value.value))
         elif value is None:
-            print("empty")
+            pass
+        elif type(value) is str:
+            print("    " * self.indent + "{}".format(value))
         else:
             print("    "*self.indent + "{}  {}".format(name,value.__class__.__name__))
             self.indent += 1

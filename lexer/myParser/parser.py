@@ -139,33 +139,33 @@ class ExprLogicalAnd(Expr):
         p.print("Right", self.right)
 
 class ExprComparsion(Expr):
-    def __init__(self,operator,left,right):
-        self.operator = operator
+    def __init__(self,left,operator,right):
         self.left = left
+        self.operator = operator
         self.right = right
     def print(self,p):
-        p.print("Operator",self.operator)
         p.print("Left",self.left)
+        p.print("Operator",self.operator)
         p.print("Right",self.right)
 
 class ExprAdd(Expr):
-    def __init__(self,operator,left,right):
+    def __init__(self,left,operator,right):
         self.operator = operator
         self.left = left
         self.right = right
     def print(self,p):
-        p.print("Operator",self.operator)
         p.print("Left",self.left)
+        p.print("Operator",self.operator)
         p.print("Right",self.right)
         
 class ExprMult(Expr):
-    def __init__(self,operator,left,right):
+    def __init__(self,left,operator,right):
         self.operator = operator
         self.left = left
         self.right = right
     def print(self,p):
-        p.print("Operator",self.operator)
         p.print("Left",self.left)
+        p.print("Operator",self.operator)
         p.print("Right",self.right)
         
 class ExprUnary(Expr):

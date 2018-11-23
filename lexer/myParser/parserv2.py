@@ -56,6 +56,22 @@ class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.position = 0
+        self.compOperators = [
+            TokenType.greaterThan,
+            TokenType.greaterThanOrEqual,
+            TokenType.lessThan,
+            TokenType.lessThanOrEqual,
+            TokenType.equal,
+            TokenType.notEqual
+        ]
+        self.addOperators = [
+            TokenType.plus,
+            TokenType.minus
+        ]
+        self.multOperators = [
+            TokenType.mult,
+            TokenType.div
+        ]
 
     def identPosition(self):
         self.position += 1
@@ -230,21 +246,56 @@ class Parser:
         
     def parse_logical_or_expr(self):
         left = self.parse_logical_and_expr()
-        while self.accept(TokenType.logicalOr) is not None:
+        while True:
+            result = self.accept(TokenType.logicalOr)
+            if result is None:
+                break
             right = self.parse_logical_and_expr()
-            left = ExprLogicalOr(left,"meme",right)
+            left = ExprLogicalOr(left,result,right)
         return left
     
     def parse_logical_and_expr(self):
         left = self.parse_comparsion_expr()
-        while self.accept(TokenType.logicalAnd) is not None:
+        while True:
+            result = self.accept(TokenType.logicalAnd)
+            if result is None:
+                break
             right = self.parse_comparsion_expr()
-            left = ExprLogicalAnd(left,"even more meme", right)
+            left = ExprLogicalAnd(left,result, right)
         return left
         
     def parse_comparsion_expr(self):
+        left = self.parse_add_expr()
+        while True:
+            result = self.accept(TokenType.greaterThan)
+            if result is None:
+                break
+            right = self.parse_add_expr()
+            left = ExprComparsion(left,result,right)
+        return left
+
+    def parse_add_expr(self):
+        left = self.parse_mult_expr()
+        while True:
+            if self.currentToken().type in self.addOperators:
+                result = self.accept(self.currentToken().type)
+                if result is None:
+                    break
+                right = self.parse_mult_expr()
+                left = ExprAdd(left,result,right)
+            else:
+                break
+        return left
+
+    def parse_mult_expr(self):
         left = self.parse_term_expr()
-        while self.accept(TokenType.greaterThan):
-            right = self.parse_term_expr()
-            left = ExprComparsion(left,"more meme",right)
+        while True:
+            if self.currentToken().type in self.multOperators:
+                result = self.accept(self.currentToken().type)
+                if result is None:
+                    break
+                right = self.parse_term_expr()
+                left = ExprMult(left,result,right)
+            else:
+                break
         return left
