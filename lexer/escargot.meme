@@ -1,7 +1,4 @@
-define integer meme(integer a)
+define integer meme(integer lmao)
 [
-    lmao and meme or xxxx > lolz + eskettit - omegalul * omgwtf / GUCCi
-]
-define string lmao()
-[
+    meme -> 2
 ]

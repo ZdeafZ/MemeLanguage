@@ -72,6 +72,9 @@ class Parser:
             TokenType.mult,
             TokenType.div
         ]
+        self.unaryOperators = [
+            TokenType.notSomething
+        ]
 
     def identPosition(self):
         self.position += 1
@@ -189,6 +192,8 @@ class Parser:
                 return StmtBreak()
             elif self.currentToken().value == "while":
                 return self.parse_while_stmt()
+            elif self.currentToken().value == "integer":
+                return self.parse_assignment_stmt()
         else:
             return self.parse_stmt_expr()
 
@@ -215,15 +220,29 @@ class Parser:
             body = self.parse_stmt_body()
         return StmtWhile(cond, body)
 
+    def parse_assignment_stmt(self):
+        type = None
+        if self.currentToken().type == TokenType.keyword:
+           type = self.parse_type()
+        name = self.parse_ident()
+        operator = self.expect(TokenType.assign)
+        right = self.parse_stmt_expr()
+        return StmtAsign(type,name,operator,right)
+
+
     def parse_priority_expr(self):
         self.expect(TokenType.leftParenthesis)
-        expr = self.parse_expr()
+        expr = self.parse_stmt_expr()
         self.expect(TokenType.rightParenthesis)
         return ExprPriority(expr)
 
     def parse_term_expr(self):
         if self.currentToken().type == TokenType.identifier:
             name = self.expect(TokenType.identifier)
+            op = self.accept(TokenType.assign)
+            if op is not None:
+                right = self.parse_stmt_expr()
+                return StmtAsign(None,name,op,right)
             return ExprIdent(name)
         elif self.currentToken().type == TokenType.integerLiteral:
             literal = self.expect(TokenType.integerLiteral)
@@ -288,14 +307,22 @@ class Parser:
         return left
 
     def parse_mult_expr(self):
-        left = self.parse_term_expr()
+        left = self.parse_unary_expr()
         while True:
             if self.currentToken().type in self.multOperators:
                 result = self.accept(self.currentToken().type)
                 if result is None:
                     break
-                right = self.parse_term_expr()
+                right = self.parse_unary_expr()
                 left = ExprMult(left,result,right)
             else:
                 break
         return left
+
+    def parse_unary_expr(self):
+        if self.currentToken().type in self.unaryOperators:
+            operator =  self.accept(self.currentToken().type)
+            right = self.parse_term_expr()
+            return ExprUnary(operator,right)
+        else:
+            return self.parse_term_expr()

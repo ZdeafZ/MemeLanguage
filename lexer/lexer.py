@@ -316,6 +316,7 @@ with open ("operators.txt", "r") as file:
     operatorList = file.read().split(",")
 lexer = Lexer(string, keywordList, operatorList)
 lexer.run()
+#lexer.printTokens()
 parser = Parser(lexer.tokenList)
 result = parser.parse_functions()
 printer = ASTPrinter()

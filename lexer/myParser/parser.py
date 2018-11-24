@@ -117,6 +117,18 @@ class StmtWhile(Stmt):
     def print(self,p):
         p.print("Cond",self.cond)
         p.print("Body",self.body)
+class StmtAsign(Stmt):
+    def __init__(self,type,name,operator,right):
+        self.type = type
+        self.name = name
+        self.operator = operator
+        self.right = right
+
+    def print(self, p):
+        p.print("Type", self.type)
+        p.print("Name", self.name)
+        p.print("Operator",self.operator)
+        p.print("Right",self.right)
 
 class ExprLogicalOr(Expr):
     def __init__(self,left,op,right):

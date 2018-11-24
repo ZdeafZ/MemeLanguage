@@ -25,7 +25,7 @@ BNF'as
 <identifier> ::= <letter> | <identifier><lit_int> | <identifier>"_"<letter> | <identifier>"_"<lit_int> | <identifier> <letter>
 
 <primary_expression> ::= <constant> | <identifier> | <func_expression> | <priority_expression>
-<unary_expression> ::= <primary_expression> | "!" <primary_expression> | "-" <primary_expression>
+<unary_expression> ::= <primary_expression> | "!" <primary_expression>
 <divmult_expression> ::= <unary_expression> | <divmult_expression> "/" <unary_expression> | <divmult_expression> "*" <unary_expression> | <divmult_expression> "%" <unary_expression>
 <addsubtr_expression> ::= <divmult_expression> | <addsubtr_expression> "+" <divmult_expression> | <addsubtr_expression> "-" <divmult_expression>
 <comparsion_expression> ::= <addsubtr_expression> | <comparsion_expression> <comparsion_signs> <addsubtr_expression>
