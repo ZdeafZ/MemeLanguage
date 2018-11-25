@@ -107,6 +107,13 @@ class StmtReturn(Stmt):
     def print(self,p):
         p.print("Return Value",self.value)
 
+class StmtContinue(Stmt):
+    def __init__(self, token):
+        self.token = token
+
+    def print(self,p):
+        p.print("Continue", self.token)
+
 class StmtIf(Stmt):
     def __init__(self, branches, body):
         self.branches = branches
@@ -117,8 +124,10 @@ class StmtIf(Stmt):
         p.print("Else block",self.body)
 
 class StmtBreak(Stmt):
+    def __init__(self,token):
+        self.token = token
     def print(self,p):
-        p.print("Break")
+        p.print("Break", self.token)
 
 class StmtWhile(Stmt):
     def __init__(self, cond, body):

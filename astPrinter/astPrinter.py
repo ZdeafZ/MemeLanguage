@@ -8,7 +8,7 @@ class ASTPrinter:
         if type(value) is list:
             self.printArray(name,value)
         elif type(value) is Token:
-            print("    "*self.indent + "{}  {}  {}  {}".format(name,value.__class__.__name__, value.type, value.value))
+            print("    "*self.indent + "{}  {}  {}".format(name, value.type, value.value))
         elif value is None:
             pass
         elif type(value) is str:

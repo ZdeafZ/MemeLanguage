@@ -24,6 +24,8 @@ try:
         lexer.printTokens()
     if str(sys.argv[2]) == "parse":
         result.print(printer)
+    else:
+        print("Argument not found. Argument list can be found in the README", file=sys.stderr)
 except IndexError:
     lexer.printTokens()
     result.print(printer)

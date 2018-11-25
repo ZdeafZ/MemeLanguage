@@ -189,8 +189,9 @@ class Parser:
             elif self.currentToken().value == "return":
                 return self.parse_return_stmt()
             elif self.currentToken().value == "break":
-                self.expect(TokenType.keyword)
-                return StmtBreak()
+                return StmtBreak(self.expect(TokenType.keyword))
+            elif self.currentToken().value == "continue":
+                return StmtContinue(self.expect(TokenType.keyword))
             elif self.currentToken().value == "while":
                 return self.parse_while_stmt()
             elif self.currentToken().value == "integer":
