@@ -1,5 +1,5 @@
 Programming language university project.
 Written in python 3.6.0.
-USAGE SO FAR. //TODO make a main file.
-python lexer.py filename (file extension must be .meme)
-BNF and eBNF stores the gramatic.
+USAGE SO FAR.
+python main.py filename (file extension must be .meme)
+BNF and eBNF stores the grammar.
