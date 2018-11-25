@@ -76,6 +76,10 @@ class Parser:
         self.unaryOperators = [
             TokenType.notSomething
         ]
+    def peekAtTokens(self):
+        if self.position < len(self.tokens)-1:
+            return self.tokens[self.position+1]
+
 
     def identPosition(self):
         self.position += 1
@@ -202,11 +206,30 @@ class Parser:
         return StmtReturn(value)
 
     def parse_if_stmt(self):
+        branches = []
+        elsebody = None
+        eifcond = None
+        eifbody = None
         self.expectKeyword("if")
         cond = self.parse_stmt_expr()
         self.expect(TokenType.newLine)
         body = self.parse_stmt_body()
-        return StmtIf(cond, body)
+        branches.append(Branch(cond,body))
+        if self.peekAtTokens().value == "elseif":
+            self.expect(TokenType.newLine)
+        while self.currentToken().value == "elseif":
+            self.expectKeyword("elseif")
+            eifcond = self.parse_stmt_expr()
+            self.expect(TokenType.newLine)
+            eifbody = self.parse_stmt_body()
+            branches.append(Branch(eifcond, eifbody))
+            if self.peekAtTokens().value == "elseif" or  self.peekAtTokens().value == "else":
+                self.expect(TokenType.newLine)
+        if self.currentToken().value == "else":
+            self.expectKeyword("else")
+            self.expect(TokenType.newLine)
+            elsebody = self.parse_stmt_body()
+        return StmtIf(branches,elsebody)
 
     def parse_while_stmt(self):
         self.expect(TokenType.keyword)

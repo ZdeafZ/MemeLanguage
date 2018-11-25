@@ -18,4 +18,12 @@ lexer.run()
 parser = Parser(lexer.tokenList)
 result = parser.parse_functions()
 printer = ASTPrinter()
-result.print(printer)
+
+try:
+    if str(sys.argv[2]) == "lex":
+        lexer.printTokens()
+    if str(sys.argv[2]) == "parse":
+        result.print(printer)
+except IndexError:
+    lexer.printTokens()
+    result.print(printer)

@@ -287,7 +287,7 @@ class Lexer:
                 break
             else:
                 self.appendToString()
-        if self.tempString in self.keywords:
+        if self.tempString in self. keywords:
             return Token(TokenType.keyword,self.tempString, self.line)
         elif self.tempString == "truth" or self.tempString == "lie":
             return Token(TokenType.booleanLiteral, self.tempString, self.line)

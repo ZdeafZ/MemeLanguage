@@ -61,16 +61,27 @@ class  ExprVar(Expr):
         p.print("Name",self.name)
 
 class Arg(Node):
-    def __init__(self, rtype, name):
-        self.rtype = rtype
+    def __init__(self, arg_type, name):
+        self.arg_type = arg_type
         self.name = name
 
     def print(self,p):
-        p.print("Return type",self.rtype)
+        p.print("Arg Type",self.arg_type)
         p.print("Name",self.name)
+
 
 class Stmt(Node):
     pass
+
+
+class Branch(Stmt):
+    def __init__(self, cond, body):
+        self.cond = cond
+        self.body = body
+
+    def print(self,p):
+        p.print("Cond",self.cond)
+        p.print("Body",self.body)
 
 class StmtBlock(Stmt):
     def __init__(self):
@@ -97,13 +108,13 @@ class StmtReturn(Stmt):
         p.print("Return Value",self.value)
 
 class StmtIf(Stmt):
-    def __init__(self, cond, body):
-        self.cond = cond
+    def __init__(self, branches, body):
+        self.branches = branches
         self.body = body
 
     def print(self,p):
-        p.print("Cond",self.cond)
-        p.print("Body",self.body)
+        p.print("Condition branches", self.branches)
+        p.print("Else block",self.body)
 
 class StmtBreak(Stmt):
     def print(self,p):

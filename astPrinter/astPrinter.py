@@ -1,4 +1,5 @@
 from myparser.myparser import Token
+
 class ASTPrinter:
     def __init__(self):
         self.indent = 0
