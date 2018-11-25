@@ -104,6 +104,32 @@ class StmtIf(Stmt):
     def print(self,p):
         p.print("Cond",self.cond)
         p.print("Body",self.body)
+class StmtElse(Stmt):
+    def __init__(self, body):
+        self.body = body
+
+    def print(self,p):
+        p.print("Body",self.body)
+
+class StmtElseIf(Stmt):
+    def __init__(self, cond, body):
+        self.cond = cond
+        self.body = body
+
+    def print(self, p):
+        p.print("Cond", self.cond)
+        p.print("Body", self.body)
+
+class FullConditionalStmt(Stmt):
+    def __init__(self,ifs,elseifs,elses):
+        self.ifs = ifs
+        self.elseifs = elseifs
+        self.elses = elses
+
+    def print(self, p):
+        p.print("If statement", self.ifs)
+        p.print("Elseif statements", self.elseifs)
+        p.print("Else statement", self.elses)
 
 class StmtBreak(Stmt):
     def print(self,p):
