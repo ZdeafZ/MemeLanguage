@@ -2,7 +2,7 @@ define integer meme(integer lmao)
 [
     if something
     then
-        meme
+        meme + lmao - eskettit
     end
     meme
 ]

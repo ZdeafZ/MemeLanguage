@@ -53,7 +53,7 @@ class ExprConstant(Expr):
     def print(self,p):
         p.print("Literal",self.lit)
 
-class  ExprIdent(Expr):
+class  ExprVar(Expr):
     def __init__(self, name):
         self.name = name
 
@@ -90,11 +90,11 @@ class StmtExpr(Stmt):
         p.print("Expression",self.expr)
 
 class StmtReturn(Stmt):
-    def __init__(self, rident):
-        self.rident = rident
+    def __init__(self, value):
+        self.value = value
 
     def print(self,p):
-        p.print("Return Value",self.rident)
+        p.print("Return Value",self.value)
 
 class StmtIf(Stmt):
     def __init__(self, cond, body):
@@ -104,32 +104,6 @@ class StmtIf(Stmt):
     def print(self,p):
         p.print("Cond",self.cond)
         p.print("Body",self.body)
-class StmtElse(Stmt):
-    def __init__(self, body):
-        self.body = body
-
-    def print(self,p):
-        p.print("Body",self.body)
-
-class StmtElseIf(Stmt):
-    def __init__(self, cond, body):
-        self.cond = cond
-        self.body = body
-
-    def print(self, p):
-        p.print("Cond", self.cond)
-        p.print("Body", self.body)
-
-class FullConditionalStmt(Stmt):
-    def __init__(self,ifs,elseifs,elses):
-        self.ifs = ifs
-        self.elseifs = elseifs
-        self.elses = elses
-
-    def print(self, p):
-        p.print("If statement", self.ifs)
-        p.print("Elseif statements", self.elseifs)
-        p.print("Else statement", self.elses)
 
 class StmtBreak(Stmt):
     def print(self,p):
@@ -143,7 +117,8 @@ class StmtWhile(Stmt):
     def print(self,p):
         p.print("Cond",self.cond)
         p.print("Body",self.body)
-class StmtAsign(Stmt):
+
+class StmtAssign(Stmt):
     def __init__(self,type,name,operator,right):
         self.type = type
         self.name = name
@@ -156,47 +131,7 @@ class StmtAsign(Stmt):
         p.print("Operator",self.operator)
         p.print("Right",self.right)
 
-class ExprLogicalOr(Expr):
-    def __init__(self,left,op,right):
-        self.left = left
-        self.op = op
-        self.right = right
-    def print(self,p):
-        p.print("Left",self.left)
-        p.print("Operator",self.op)
-        p.print("Right",self.right)
-        
-class ExprLogicalAnd(Expr):
-    def __init__(self,left,op,right):
-        self.left = left
-        self.op = op
-        self.right = right
-    def print(self,p):
-        p.print("Left", self.left)
-        p.print("Operator", self.op)
-        p.print("Right", self.right)
-
-class ExprComparsion(Expr):
-    def __init__(self,left,operator,right):
-        self.left = left
-        self.operator = operator
-        self.right = right
-    def print(self,p):
-        p.print("Left",self.left)
-        p.print("Operator",self.operator)
-        p.print("Right",self.right)
-
-class ExprAdd(Expr):
-    def __init__(self,left,operator,right):
-        self.operator = operator
-        self.left = left
-        self.right = right
-    def print(self,p):
-        p.print("Left",self.left)
-        p.print("Operator",self.operator)
-        p.print("Right",self.right)
-        
-class ExprMult(Expr):
+class ExprBinary(Expr):
     def __init__(self,left,operator,right):
         self.operator = operator
         self.left = left

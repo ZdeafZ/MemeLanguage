@@ -1,7 +1,7 @@
 from enum import Enum
 import sys
-from myParser.parserv2 import Parser,TokenType,Token
-from myAstPrinter.astPrinter import ASTPrinter
+sys.path.append('../')
+from myparser.myparser import * 
 
 class States(Enum):
     eof = -1
@@ -287,7 +287,7 @@ class Lexer:
                 break
             else:
                 self.appendToString()
-        if self.tempString in keywordList:
+        if self.tempString in self.keywords:
             return Token(TokenType.keyword,self.tempString, self.line)
         elif self.tempString == "truth" or self.tempString == "lie":
             return Token(TokenType.booleanLiteral, self.tempString, self.line)
@@ -302,22 +302,3 @@ class Lexer:
 
     def rspace(self):
         self.indentPosition()
-
-
-try:
-    with open("{}.meme".format(str(sys.argv[1])), "r") as file:
-        string = file.read()
-except:
-    print("File you are trying to lex was not found. Exiting")
-    sys.exit()
-with open ("keywords.txt", "r") as file:
-    keywordList = file.read().split(",")
-with open ("operators.txt", "r") as file:
-    operatorList = file.read().split(",")
-lexer = Lexer(string, keywordList, operatorList)
-lexer.run()
-#lexer.printTokens()
-parser = Parser(lexer.tokenList)
-result = parser.parse_functions()
-printer = ASTPrinter()
-result.print(printer)

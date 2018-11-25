@@ -1,5 +1,5 @@
 import sys
-from myParser.parser import *
+from myparser.myast import *
 
 
 class TokenType:
@@ -52,6 +52,7 @@ class Token:
     def print(self):
         print("|       {:22}       |        {:15}       |{:5}    |".format(self.type.upper(),self.value,self.line+1))
 
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -82,13 +83,11 @@ class Parser:
     def currentToken(self):
         return self.tokens[self.position]
 
-
     def accept(self, token):
         curr_token = self.tokens[self.position]
         if curr_token.type == token:
             self.identPosition()
             return curr_token
-
 
     def expect(self, token):
         result = self.accept(token)
@@ -96,8 +95,8 @@ class Parser:
             return result
         else:
             curr_token = self.tokens[self.position]
-            print("error")
-            print(" found {} expected {} at line {}".format(curr_token.type, token, curr_token.line + 1))
+            print("error",file=sys.stderr)
+            print(" found {} expected {} at line {}".format(curr_token.type, token, curr_token.line + 1), file=sys.stderr)
             sys.exit()
 
     def expectKeyword(self,value):
@@ -105,8 +104,8 @@ class Parser:
             return self.expect(TokenType.keyword)
         else:
             curr_token = self.tokens[self.position]
-            print("error")
-            print(" found {} with value {} expected value {} at line {}".format(curr_token.type, self.currentToken().value, value, curr_token.line + 1))
+            print("error",file=sys.stderr)
+            print(" found {} with value {} expected value {} at line {}".format(curr_token.type, self.currentToken().value, value, curr_token.line + 1),file=sys.stderr)
             sys.exit()
 
     def parse_function(self):
@@ -140,7 +139,7 @@ class Parser:
 
     def parse_ident(self):
         result = self.expect(TokenType.identifier)
-        return ExprIdent(result)
+        return ExprVar(result)
 
     def parse_args(self):
         args = []
@@ -165,7 +164,6 @@ class Parser:
             self.expect(TokenType.newLine)
         return node
 
-
     def parse_stmt_body(self):
         node = StmtBlock()
         self.expectKeyword("then")
@@ -177,7 +175,6 @@ class Parser:
             self.expect(TokenType.newLine)
         self.expectKeyword("end")
         return node
-
 
     def parse_stmt(self):
         if self.currentToken().type == TokenType.leftBracket:
@@ -201,19 +198,19 @@ class Parser:
         self.expectKeyword("return")
         value = None
         if self.currentToken().type is not TokenType.newLine:
-            value = self.parse_ident()
+            value = self.parse_stmt_expr()
         return StmtReturn(value)
 
     def parse_if_stmt(self):
         self.expectKeyword("if")
-        cond = self.parse_term_expr()
+        cond = self.parse_stmt_expr()
         self.expect(TokenType.newLine)
         body = self.parse_stmt_body()
         return StmtIf(cond, body)
 
     def parse_while_stmt(self):
         self.expect(TokenType.keyword)
-        cond = self.parse_term_expr()
+        cond = self.parse_stmt_expr()
         self.expect(TokenType.newLine)
         body = None
         if self.currentToken().value == "then":
@@ -227,8 +224,7 @@ class Parser:
         name = self.parse_ident()
         operator = self.expect(TokenType.assign)
         right = self.parse_stmt_expr()
-        return StmtAsign(type,name,operator,right)
-
+        return StmtAssign(type,name,operator,right)
 
     def parse_priority_expr(self):
         self.expect(TokenType.leftParenthesis)
@@ -242,8 +238,8 @@ class Parser:
             op = self.accept(TokenType.assign)
             if op is not None:
                 right = self.parse_stmt_expr()
-                return StmtAsign(None,name,op,right)
-            return ExprIdent(name)
+                return StmtAssign(None,name,op,right)
+            return ExprVar(name)
         elif self.currentToken().type == TokenType.integerLiteral:
             literal = self.expect(TokenType.integerLiteral)
             return ExprConstant(literal)
@@ -270,7 +266,7 @@ class Parser:
             if result is None:
                 break
             right = self.parse_logical_and_expr()
-            left = ExprLogicalOr(left,result,right)
+            left = ExprBinary(left, result, right)
         return left
     
     def parse_logical_and_expr(self):
@@ -280,7 +276,7 @@ class Parser:
             if result is None:
                 break
             right = self.parse_comparsion_expr()
-            left = ExprLogicalAnd(left,result, right)
+            left = ExprBinary(left, result, right)
         return left
         
     def parse_comparsion_expr(self):
@@ -290,7 +286,7 @@ class Parser:
             if result is None:
                 break
             right = self.parse_add_expr()
-            left = ExprComparsion(left,result,right)
+            left = ExprBinary(left, result, right)
         return left
 
     def parse_add_expr(self):
@@ -301,7 +297,7 @@ class Parser:
                 if result is None:
                     break
                 right = self.parse_mult_expr()
-                left = ExprAdd(left,result,right)
+                left = ExprBinary(left, result, right)
             else:
                 break
         return left
@@ -314,7 +310,7 @@ class Parser:
                 if result is None:
                     break
                 right = self.parse_unary_expr()
-                left = ExprMult(left,result,right)
+                left = ExprBinary(left, result, right)
             else:
                 break
         return left
@@ -323,6 +319,6 @@ class Parser:
         if self.currentToken().type in self.unaryOperators:
             operator =  self.accept(self.currentToken().type)
             right = self.parse_term_expr()
-            return ExprUnary(operator,right)
+            return ExprUnary(operator, right)
         else:
             return self.parse_term_expr()
