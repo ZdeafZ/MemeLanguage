@@ -12,7 +12,7 @@ class ASTPrinter:
         elif value is None:
             pass
         elif type(value) is str:
-            print("    " * self.indent + "{}".format(value))
+            print("    " * self.indengitt + "{}".format(value))
         else:
             print("    "*self.indent + "{}  {}".format(name,value.__class__.__name__))
             self.indent += 1
