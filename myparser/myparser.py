@@ -1,7 +1,6 @@
 import sys
 from myparser.myast import *
 
-
 class TokenType:
 
     identifier = "identifier"
@@ -143,7 +142,7 @@ class Parser:
 
     def parse_ident(self):
         result = self.expect(TokenType.identifier)
-        return ExprVar(result)
+        return result
 
     def parse_args(self):
         args = []
@@ -260,9 +259,16 @@ class Parser:
         if self.currentToken().type == TokenType.identifier:
             name = self.expect(TokenType.identifier)
             op = self.accept(TokenType.assign)
+            call = self.accept(TokenType.leftParenthesis)
+            args = []
             if op is not None:
                 right = self.parse_stmt_expr()
                 return StmtAssign(None,name,op,right)
+            elif call is not None:
+                while self.accept(TokenType.rightParenthesis) is None:
+                    args.append(self.parse_stmt_expr())
+                    self.accept(TokenType.comma)
+                return ExprCall(name,args)
             return ExprVar(name)
         elif self.currentToken().type == TokenType.integerLiteral:
             literal = self.expect(TokenType.integerLiteral)
@@ -346,3 +352,38 @@ class Parser:
             return ExprUnary(operator, right)
         else:
             return self.parse_term_expr()
+
+
+class Scope:
+    def __init__(self,parent_scope=None):
+        self.members = {}
+        self.parent_scope = parent_scope
+
+    def add(self,name,node):
+        if type(name) is not Token:
+            raise TypeError("expected token got {}".format(type(name)))
+        if not issubclass(type(node),Node):
+            raise TypeError("expected node got {}".format(type(node)))
+        if type(name) is Token:
+            if name.value in self.members:
+                print("{}.meme:{}:error:duplicate variable {}".format(sys.argv[1], name.line + 1, name.value),
+                      file=sys.stderr)
+            else:
+                self.members[name.value] = node
+        elif name is Node:
+            if name.name.value in self.members:
+                print("{}.meme:{}:error:duplicate variable {}".format(sys.argv[1], name.name.line + 1, name.name.value),
+                      file=sys.stderr)
+            else:
+                self.members[name.name.value] = node
+
+    def resolve(self,name):
+        if type(name) is not Token:
+            raise TypeError("expected token got {}".format(type(name)))
+        elif name.value in self.members:
+            return self.members[name.value]
+        elif self.parent_scope is not None:
+            return self.parent_scope.resolve(name)
+        else:
+            print("{}.meme:{}:error:undeclared variable {}".format(sys.argv[1], name.line + 1, name.value),
+                  file=sys.stderr)

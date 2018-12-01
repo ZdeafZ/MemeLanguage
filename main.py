@@ -1,7 +1,7 @@
-import sys
-from lexer.lexer import *
+import lexer.lexer as lex
 from myparser.myparser import *
-from astPrinter.astPrinter import ASTPrinter
+import astPrinter.astPrinter as printer
+import sys
 try:
     with open("{}.meme".format(str(sys.argv[1])), "r") as file:
         string = file.read()
@@ -13,19 +13,23 @@ with open ("lexer/keywords.txt", "r") as file:
 with open ("lexer/operators.txt", "r") as file:
     operatorList = file.read().split(",")
 
-lexer = Lexer(string, keywordList, operatorList)
+lexer = lex.Lexer(string, keywordList, operatorList)
 lexer.run()
 parser = Parser(lexer.tokenList)
 result = parser.parse_functions()
-printer = ASTPrinter()
+printer = printer.ASTPrinter()
 
 try:
     if str(sys.argv[2]) == "lex":
         lexer.printTokens()
-    if str(sys.argv[2]) == "parse":
+    elif str(sys.argv[2]) == "parse":
         result.print(printer)
+    elif str(sys.argv[2]) == "resolve":
+        root_scope = Scope()
+        result.resolve_names(root_scope)
     else:
         print("Argument not found. Argument list can be found in the README", file=sys.stderr)
 except IndexError:
     lexer.printTokens()
     result.print(printer)
+
