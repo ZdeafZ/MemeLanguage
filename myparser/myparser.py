@@ -1,6 +1,7 @@
 import sys
 from myparser.myast import *
 
+
 class TokenType:
 
     identifier = "identifier"
@@ -78,7 +79,6 @@ class Parser:
     def peekAtTokens(self):
         if self.position < len(self.tokens)-1:
             return self.tokens[self.position+1]
-
 
     def identPosition(self):
         self.position += 1

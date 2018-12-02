@@ -132,11 +132,9 @@ class StmtBlock(Stmt):
 
     def resolve_names(self, scope):
         import myparser.myparser as parser
-        print("new scope")
         inner_scope = parser.Scope(scope)
         for stmt in self.stmts:
             stmt.resolve_names(inner_scope)
-        print(inner_scope.members)
 
 class StmtExpr(Stmt):
     def __init__(self,expr):
@@ -169,6 +167,8 @@ class StmtContinue(Stmt):
     def print(self,p):
         p.print("Continue", self.token)
 
+    def resolve_names(self,scope):
+        pass
 
 class StmtIf(Stmt):
     def __init__(self, branches, body):
@@ -192,6 +192,8 @@ class StmtBreak(Stmt):
     def print(self,p):
         p.print("Break", self.token)
 
+    def resolve_names(self,scope):
+        pass
 
 class StmtWhile(Stmt):
     def __init__(self, cond, body):
