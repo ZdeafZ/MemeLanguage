@@ -1,9 +1,70 @@
+import sys
+
+
+class TokenType:
+
+    identifier = "identifier"
+    number = "number"
+    keyword = "keyword"
+    operator = "operator"
+    integerType = "type_integer"
+    doubleType = "type_double"
+    stringType = "type_string"
+    characterType = "type_character"
+    integerLiteral = "integer"
+    booleanLiteral = "boolean"
+    stringLiteral = "string"
+    floatLiteral = "float"
+    logicalAnd = "logical_and_op"
+    logicalOr = "logical_or_op"
+    plus = "plus_op"
+    minus = "minus_op"
+    mult = "multiplication_op"
+    div = "division_op"
+    greaterThan = "greater_than"
+    greaterThanOrEqual = "greater_than_or_equal"
+    lessThan = "less_than"
+    lessThanOrEqual = "less_than_or_equal"
+    equal = "equal"
+    notSomething = "not"
+    notEqual = "not_equal"
+    assign = "assignment"
+    leftParenthesis = "left_parenthesis"
+    rightParenthesis = "right_parenthesis"
+    leftBrace = "left_brace"
+    rightBrace = "right_brace"
+    leftBracket = "left_bracket"
+    rightBracket = "right_bracket"
+    newLine = "new_line"
+    endOfFile = "end_of_file"
+    commentStart = "comment_start"
+    commentEnd = "comment_end"
+    comma = "comma"
+
+
+def unify_types(type1,type2):
+    if type1 is None:
+        print("type1 is gay")
+    elif type2 is None:
+        print("type2 is gay")
+    else:
+        if type(type1) != type(type2):
+            if type2.type.type != "keyword":
+                print("{}.meme:{}:error:type mismatch: {} vs {}".format(sys.argv[1], type2.type.line +1, type1.type.value, type2.type.type),
+                      file=sys.stderr)
+            else:
+                print("{}.meme:{}:error:type mismatch: {} vs {}".format(sys.argv[1], type2.type.line + 1,
+                                                                        type1.type.value, type2.type.value),
+                      file=sys.stderr)
 
 class Node:
     def print(self,p):
         p.print("CLASS NOT IMPLEMENTED")
 
     def resolve_names(self, scope):
+        print("not implemented for {}".format(self.__class__.__name__))
+
+    def check_types(self):
         print("not implemented for {}".format(self.__class__.__name__))
 
 
@@ -27,6 +88,9 @@ class FuncDefinition(Node):
             inner_scope.add(args.name,args)
         self.funcbody.resolve_names(inner_scope)
 
+    def check_types(self):
+        self.funcbody.check_types()
+
 
 class Functions(Node):
 
@@ -45,8 +109,56 @@ class Functions(Node):
         for func in self.functions:
             func.resolve_names(scope)
 
+    def check_types(self):
+        for func in self.functions:
+            func.check_types()
+
 
 class Type(Node):
+    pass
+
+
+class TypeInt(Type):
+    def __init__(self, rtype):
+        self.type = rtype
+
+    def print(self,p):
+        p.print("Type",self.type)
+
+
+class TypeString(Type):
+    def __init__(self, rtype):
+        self.type = rtype
+
+    def print(self,p):
+        p.print("Type",self.type)
+
+
+class TypeFloat(Type):
+    def __init__(self, rtype):
+        self.type = rtype
+
+    def print(self,p):
+        p.print("Type",self.type)
+
+
+class TypeNothing(Type):
+    def __init__(self, rtype):
+        self.type = rtype
+
+    def print(self,p):
+        p.print("Type",self.type)
+
+
+class TypeBoolean(Type):
+    def __init__(self, rtype):
+        self.type = rtype
+
+    def print(self,p):
+        p.print("Type",self.type)
+
+
+class TypeCharacter(Type):
     def __init__(self, rtype):
         self.type = rtype
 
@@ -80,6 +192,16 @@ class ExprConstant(Expr):
     def resolve_names(self,scope):
         pass
 
+    def check_types(self):
+        if self.lit.type == TokenType.integerLiteral:
+            return TypeInt(self.lit)
+        elif self.lit.type == TokenType.floatLiteral:
+            return TypeFloat(self.lit)
+        elif self.lit.type == TokenType.stringLiteral:
+            return TypeFloat(self.lit)
+        elif self.lit.type == TokenType.booleanLiteral:
+            return TypeFloat(self.lit)
+
 
 class ExprVar(Expr):
     def __init__(self, name):
@@ -89,8 +211,11 @@ class ExprVar(Expr):
         p.print("Name",self.name)
 
     def resolve_names(self,scope):
-        target = scope.resolve(self.name)
+        self.target = scope.resolve(self.name)
 
+
+    def check_types(self):
+        return self.target.type
 
 class Arg(Node):
     def __init__(self, arg_type, name):
@@ -136,6 +261,10 @@ class StmtBlock(Stmt):
         for stmt in self.stmts:
             stmt.resolve_names(inner_scope)
 
+    def check_types(self):
+        for stmt in self.stmts:
+            stmt.check_types()
+
 class StmtExpr(Stmt):
     def __init__(self,expr):
         self.expr = expr
@@ -146,7 +275,8 @@ class StmtExpr(Stmt):
     def resolve_names(self,scope):
         if self.expr is not None:
             self.expr.resolve_names(scope)
-
+    def check_types(self):
+        return self.expr.check_types()
 
 class StmtReturn(Stmt):
     def __init__(self, value):
@@ -223,11 +353,18 @@ class StmtAssign(Stmt):
 
     def resolve_names(self,scope):
         if self.type is None:
-            target = scope.resolve(self.name)
+            self.target = scope.resolve(self.name)
             self.right.resolve_names(scope)
         else:
             scope.add(self.name,self)
+            self.target = scope.resolve(self.name)
             self.right.resolve_names(scope)
+
+    def check_types(self):
+        target_type = self.target.type
+        value_type = self.right.check_types()
+        unify_types(target_type,value_type)
+
 
 class ExprBinary(Expr):
     def __init__(self,left,operator,right):
@@ -244,6 +381,11 @@ class ExprBinary(Expr):
         self.left.resolve_names(scope)
         self.right.resolve_names(scope)
 
+    def check_types(self):
+        left_type = self.left.check_types()
+        right_type = self.right.check_types()
+        unify_types(left_type,right_type)
+        return left_type
 
 class ExprUnary(Expr):
     def __init__(self,operator,right):
@@ -268,6 +410,21 @@ class ExprCall(Expr):
         p.print("Args",self.args)
 
     def resolve_names(self,scope):
-        target = scope.resolve(self.name)
+        self.target = scope.resolve(self.name)
         for arg in self.args:
             arg.resolve_names(scope)
+
+    def check_types(self):
+        if type(self.target) is FuncDefinition:
+            params_count = len(self.target.params)
+            args_count = len(self.args)
+            if params_count != args_count:
+                print("{}.meme:{}:error:invalid argument count: {} vs {}".format(sys.argv[1], self.target.name.line + 1
+                      , params_count, args_count),
+                      file=sys.stderr)
+            mininum = min(params_count, args_count)
+            for i in range (0,mininum):
+                param_type = self.target.params[i].arg_type
+                arg_type = self.args[i].check_types()
+                unify_types(param_type, arg_type)
+            return self.target.type

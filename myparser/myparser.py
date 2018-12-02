@@ -2,47 +2,6 @@ import sys
 from myparser.myast import *
 
 
-class TokenType:
-
-    identifier = "identifier"
-    number = "number"
-    keyword = "keyword"
-    operator = "operator"
-    integerType = "type_integer"
-    doubleType = "type_double"
-    stringType = "type_string"
-    characterType = "type_character"
-    integerLiteral = "int_lit"
-    booleanLiteral = "bool_lit"
-    stringLiteral = "string_lit"
-    floatLiteral = "float_lit"
-    logicalAnd = "logical_and_op"
-    logicalOr = "logical_or_op"
-    plus = "plus_op"
-    minus = "minus_op"
-    mult = "multiplication_op"
-    div = "division_op"
-    greaterThan = "greater_than"
-    greaterThanOrEqual = "greater_than_or_equal"
-    lessThan = "less_than"
-    lessThanOrEqual = "less_than_or_equal"
-    equal = "equal"
-    notSomething = "not"
-    notEqual = "not_equal"
-    assign = "assignment"
-    leftParenthesis = "left_parenthesis"
-    rightParenthesis = "right_parenthesis"
-    leftBrace = "left_brace"
-    rightBrace = "right_brace"
-    leftBracket = "left_bracket"
-    rightBracket = "right_bracket"
-    newLine = "new_line"
-    endOfFile = "end_of_file"
-    commentStart = "comment_start"
-    commentEnd = "comment_end"
-    comma = "comma"
-
-
 class Token:
     def __init__(self, type, value, line):
         self.type = type
@@ -75,6 +34,9 @@ class Parser:
         ]
         self.unaryOperators = [
             TokenType.notSomething
+        ]
+        self.typeList = [
+            "integer","string","boolean","float"
         ]
     def peekAtTokens(self):
         if self.position < len(self.tokens)-1:
@@ -130,15 +92,17 @@ class Parser:
     def parse_type(self):
         result = self.expect(TokenType.keyword)
         if result.value == "integer":
-            return Type(result)
+            return TypeInt(result)
         elif result.value == "string":
-            return Type(result)
+            return TypeString(result)
         elif result.value == "boolean":
-            return Type(result)
+            return TypeBoolean(result)
         elif result.value == "float":
-            return Type(result)
+            return TypeFloat(result)
         elif result.value == "character":
-            return Type(result)
+            return TypeCharacter(result)
+        elif result.value == "nothing":
+            return TypeNothing(result)
 
     def parse_ident(self):
         result = self.expect(TokenType.identifier)
@@ -193,7 +157,7 @@ class Parser:
                 return StmtContinue(self.expect(TokenType.keyword))
             elif self.currentToken().value == "while":
                 return self.parse_while_stmt()
-            elif self.currentToken().value == "integer":
+            elif self.currentToken().value in self.typeList:
                 return self.parse_assignment_stmt()
         else:
             return self.parse_stmt_expr()
@@ -247,7 +211,7 @@ class Parser:
         name = self.parse_ident()
         operator = self.expect(TokenType.assign)
         right = self.parse_stmt_expr()
-        return StmtAssign(type,name,operator,right)
+        return StmtAssign(type, name, operator, right)
 
     def parse_priority_expr(self):
         self.expect(TokenType.leftParenthesis)

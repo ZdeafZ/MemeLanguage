@@ -27,6 +27,10 @@ try:
     elif str(sys.argv[2]) == "resolve":
         root_scope = Scope()
         result.resolve_names(root_scope)
+    elif str(sys.argv[2]) == "check_types":
+        root_scope = Scope()
+        result.resolve_names(root_scope)
+        result.check_types()
     else:
         print("Argument not found. Argument list can be found in the README", file=sys.stderr)
 except IndexError:
