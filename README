@@ -2,8 +2,10 @@ Programming language university project.
 Written in python 3.6.0.
 USAGE SO FAR.
 python main.py filename [args] (file extension must be .meme, theres an example one called escargot.meme)
-args = lex, parse
-  lex displays only the lexed token list.
-  parse displays only the Abstract Syntax Tree.
-  no args displays both.
+args = lex, parse, resolve, check_types
+  lex - displays only the lexed token list.
+  parse - displays only the Abstract Syntax Tree.
+  resolve - resolves names, find duplicates or non-declared ones
+  check_types - resolves names, and checks whether types match.
+  no args - does everything.
 BNF and eBNF stores the grammar.
