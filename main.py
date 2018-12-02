@@ -36,4 +36,7 @@ try:
 except IndexError:
     lexer.printTokens()
     result.print(printer)
+    root_scope = Scope()
+    result.resolve_names(root_scope)
+    result.check_types()
 
