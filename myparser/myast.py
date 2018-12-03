@@ -10,6 +10,7 @@ class TokenType:
     integerType = "type_integer"
     doubleType = "type_double"
     stringType = "type_string"
+    nothingType = "nothing"
     characterType = "type_character"
     integerLiteral = "integer"
     booleanLiteral = "boolean"
@@ -213,7 +214,6 @@ class ExprVar(Expr):
     def resolve_names(self,scope):
         self.target = scope.resolve(self.name)
 
-
     def check_types(self):
         return self.target.type
 
@@ -265,6 +265,7 @@ class StmtBlock(Stmt):
         for stmt in self.stmts:
             stmt.check_types()
 
+
 class StmtExpr(Stmt):
     def __init__(self,expr):
         self.expr = expr
@@ -275,8 +276,10 @@ class StmtExpr(Stmt):
     def resolve_names(self,scope):
         if self.expr is not None:
             self.expr.resolve_names(scope)
+
     def check_types(self):
         return self.expr.check_types()
+
 
 class StmtReturn(Stmt):
     def __init__(self, value):
@@ -287,7 +290,14 @@ class StmtReturn(Stmt):
 
     def resolve_names(self,scope):
         if self.value is not None:
-            self.value.resolve_namess(scope)
+            self.value.resolve_names(scope)
+
+    def check_types(self):
+        if self.value is not None:
+            value_type = self.value.check_types()
+        else:
+            value_type = TypeNothing(self.value)
+        unify_types(value_type,TypeNothing(None))
 
 
 class StmtContinue(Stmt):
@@ -339,6 +349,26 @@ class StmtWhile(Stmt):
         self.body.resolve_names(scope)
 
 class StmtAssign(Stmt):
+    def __init__(self,name,operator,right):
+        self.name = name
+        self.operator = operator
+        self.right = right
+
+    def print(self, p):
+        p.print("Name", self.name)
+        p.print("Operator",self.operator)
+        p.print("Right",self.right)
+
+    def resolve_names(self,scope):
+        self.target = scope.resolve(self.name)
+        self.right.resolve_names(scope)
+
+    def check_types(self):
+        target_type = self.target.type
+        value_type = self.right.check_types()
+        unify_types(target_type,value_type)
+
+class StmtDeclaration(Stmt):
     def __init__(self,type,name,operator,right):
         self.type = type
         self.name = name
@@ -352,19 +382,14 @@ class StmtAssign(Stmt):
         p.print("Right",self.right)
 
     def resolve_names(self,scope):
-        if self.type is None:
-            self.target = scope.resolve(self.name)
-            self.right.resolve_names(scope)
-        else:
-            scope.add(self.name,self)
-            self.target = scope.resolve(self.name)
-            self.right.resolve_names(scope)
+        scope.add(self.name,self)
+        self.target = scope.resolve(self.name)
+        self.right.resolve_names(scope)
 
     def check_types(self):
         target_type = self.target.type
         value_type = self.right.check_types()
         unify_types(target_type,value_type)
-
 
 class ExprBinary(Expr):
     def __init__(self,left,operator,right):

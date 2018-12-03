@@ -1,4 +1,4 @@
 define nothing meme(integer lmao)
 [
-    string xx -> meme(100)
+    return 100
 ]

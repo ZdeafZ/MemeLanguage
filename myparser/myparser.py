@@ -205,13 +205,11 @@ class Parser:
         return StmtWhile(cond, body)
 
     def parse_assignment_stmt(self):
-        type = None
-        if self.currentToken().type == TokenType.keyword:
-           type = self.parse_type()
+        type = self.parse_type()
         name = self.parse_ident()
         operator = self.expect(TokenType.assign)
         right = self.parse_stmt_expr()
-        return StmtAssign(type, name, operator, right)
+        return StmtDeclaration(type, name, operator, right)
 
     def parse_priority_expr(self):
         self.expect(TokenType.leftParenthesis)
@@ -227,7 +225,7 @@ class Parser:
             args = []
             if op is not None:
                 right = self.parse_stmt_expr()
-                return StmtAssign(None,name,op,right)
+                return StmtAssign(name, op, right)
             elif call is not None:
                 while self.accept(TokenType.rightParenthesis) is None:
                     args.append(self.parse_stmt_expr())
