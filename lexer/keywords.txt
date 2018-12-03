@@ -1,1 +1,1 @@
-if,while,integer,float,character,string,return,break,nothing,else,elseif,define,then,end,continue
+if,while,integer,float,character,string,boolean,return,break,nothing,else,elseif,define,then,end,continue

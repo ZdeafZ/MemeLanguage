@@ -1,4 +1,7 @@
-define nothing meme(integer lmao)
+define integer lmao()
 [
-    return 100
+    boolean xd -> lie
+    while xd
+    then
+    end
 ]

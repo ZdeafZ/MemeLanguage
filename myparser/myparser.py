@@ -61,7 +61,8 @@ class Parser:
         else:
             curr_token = self.tokens[self.position]
             print("error",file=sys.stderr)
-            print("{}.meme:{}:error:found {} expected {}".format(sys.argv[1],curr_token.line + 1,curr_token.type, token), file=sys.stderr)
+            print("{}.meme:{}:error:found {} expected {}".format(sys.argv[1],curr_token.line + 1,curr_token.type, token),
+                  file=sys.stderr)
             sys.exit()
 
     def expectKeyword(self,value):
@@ -70,7 +71,8 @@ class Parser:
         else:
             curr_token = self.tokens[self.position]
             print("error",file=sys.stderr)
-            print("{}.meme:{}:error:found {} with value {} expected value {}".format(sys.argv[1],curr_token.line + 1, curr_token.type, self.currentToken().value, value,),file=sys.stderr)
+            print("{}.meme:{}:error:found {} with value {} expected value {}".format(sys.argv[1],curr_token.line + 1,
+                                                                                     curr_token.type, self.currentToken().value, value,),file=sys.stderr)
             sys.exit()
 
     def parse_function(self):

@@ -51,7 +51,8 @@ def unify_types(type1,type2):
     else:
         if type(type1) != type(type2):
             if type2.type.type != "keyword":
-                print("{}.meme:{}:error:type mismatch: {} vs {}".format(sys.argv[1], type2.type.line +1, type1.type.value, type2.type.type),
+                print("{}.meme:{}:error:type mismatch: {} vs {}".format(sys.argv[1], type2.type.line +1,
+                                                                        type1.type.value, type2.type.type),
                       file=sys.stderr)
             else:
                 print("{}.meme:{}:error:type mismatch: {} vs {}".format(sys.argv[1], type2.type.line + 1,
@@ -70,11 +71,12 @@ class Node:
 
 
 class FuncDefinition(Node):
-    def __init__ (self, rtype, name, params, body):
+    def __init__ (self, rtype, name, params, body, parent=None):
         self.type = rtype
         self.name = name
         self.params = params
         self.funcbody = body
+        self.parent = parent
 
     def print(self,p):
         p.print("Type",self.type)
@@ -173,8 +175,9 @@ class Expr(Node):
 
 
 class ExprPriority(Expr):
-    def __init__(self, exprs):
+    def __init__(self, exprs, parent=None):
         self.exprs = exprs
+        self.parent = parent
 
     def print(self ,p):
         p.print("Expression",self.exprs)
@@ -184,8 +187,9 @@ class ExprPriority(Expr):
 
 
 class ExprConstant(Expr):
-    def __init__ (self, lit):
+    def __init__ (self, lit, parent=None):
         self.lit = lit
+        self.parent = parent
 
     def print(self,p):
         p.print("Literal",self.lit)
@@ -199,14 +203,15 @@ class ExprConstant(Expr):
         elif self.lit.type == TokenType.floatLiteral:
             return TypeFloat(self.lit)
         elif self.lit.type == TokenType.stringLiteral:
-            return TypeFloat(self.lit)
+            return TypeString(self.lit)
         elif self.lit.type == TokenType.booleanLiteral:
-            return TypeFloat(self.lit)
+            return TypeBoolean(self.lit)
 
 
 class ExprVar(Expr):
-    def __init__(self, name):
+    def __init__(self, name, parent=None):
         self.name = name
+        self.parent = parent
 
     def print(self,p):
         p.print("Name",self.name)
@@ -218,9 +223,10 @@ class ExprVar(Expr):
         return self.target.type
 
 class Arg(Node):
-    def __init__(self, arg_type, name):
+    def __init__(self, arg_type, name, parent=None):
         self.arg_type = arg_type
         self.name = name
+        self.parent = parent
 
     def print(self,p):
         p.print("Arg Type",self.arg_type)
@@ -232,9 +238,10 @@ class Stmt(Node):
 
 
 class Branch(Stmt):
-    def __init__(self, cond, body):
+    def __init__(self, cond, body, parent=None):
         self.cond = cond
         self.body = body
+        self.parent = parent
 
     def print(self,p):
         p.print("Cond",self.cond)
@@ -246,8 +253,9 @@ class Branch(Stmt):
 
 
 class StmtBlock(Stmt):
-    def __init__(self):
+    def __init__(self, parent=None):
         self.stmts = []
+        self.parent = parent
 
     def appendStmt(self,stmt):
         self.stmts.append(stmt)
@@ -267,8 +275,9 @@ class StmtBlock(Stmt):
 
 
 class StmtExpr(Stmt):
-    def __init__(self,expr):
+    def __init__(self,expr,parent=None):
         self.expr = expr
+        self.parent = parent
 
     def print(self,p):
         p.print("Expression",self.expr)
@@ -282,8 +291,9 @@ class StmtExpr(Stmt):
 
 
 class StmtReturn(Stmt):
-    def __init__(self, value):
+    def __init__(self, value, parent=None):
         self.value = value
+        self.parent = parent
 
     def print(self,p):
         p.print("Return Value",self.value)
@@ -297,12 +307,13 @@ class StmtReturn(Stmt):
             value_type = self.value.check_types()
         else:
             value_type = TypeNothing(self.value)
-        unify_types(value_type,TypeNothing(None))
+        unify_types(value_type, TypeNothing(None))
 
 
 class StmtContinue(Stmt):
-    def __init__(self, token):
+    def __init__(self, token, parent=None):
         self.token = token
+        self.parent = parent
 
     def print(self,p):
         p.print("Continue", self.token)
@@ -311,9 +322,10 @@ class StmtContinue(Stmt):
         pass
 
 class StmtIf(Stmt):
-    def __init__(self, branches, body):
+    def __init__(self, branches, body, parent=None):
         self.branches = branches
         self.body = body
+        self.parent = parent
 
     def print(self,p):
         p.print("Condition branches", self.branches)
@@ -326,8 +338,9 @@ class StmtIf(Stmt):
             self.body.resolve_names(scope)
 
 class StmtBreak(Stmt):
-    def __init__(self,token):
+    def __init__(self,token, parent=None):
         self.token = token
+        self.parent = parent
 
     def print(self,p):
         p.print("Break", self.token)
@@ -336,9 +349,10 @@ class StmtBreak(Stmt):
         pass
 
 class StmtWhile(Stmt):
-    def __init__(self, cond, body):
+    def __init__(self, cond, body, parent=None):
         self.cond = cond
         self.body = body
+        self.parent = parent
 
     def print(self,p):
         p.print("Cond",self.cond)
@@ -348,11 +362,13 @@ class StmtWhile(Stmt):
         self.cond.resolve_names(scope)
         self.body.resolve_names(scope)
 
+
 class StmtAssign(Stmt):
-    def __init__(self,name,operator,right):
+    def __init__(self,name,operator,right,parent=None):
         self.name = name
         self.operator = operator
         self.right = right
+        self.parent = parent
 
     def print(self, p):
         p.print("Name", self.name)
@@ -368,12 +384,14 @@ class StmtAssign(Stmt):
         value_type = self.right.check_types()
         unify_types(target_type,value_type)
 
+
 class StmtDeclaration(Stmt):
-    def __init__(self,type,name,operator,right):
+    def __init__(self,type,name,operator,right,parent=None):
         self.type = type
         self.name = name
         self.operator = operator
         self.right = right
+        self.parent = parent
 
     def print(self, p):
         p.print("Type", self.type)
@@ -392,10 +410,11 @@ class StmtDeclaration(Stmt):
         unify_types(target_type,value_type)
 
 class ExprBinary(Expr):
-    def __init__(self,left,operator,right):
+    def __init__(self,left,operator,right,parent=None):
         self.operator = operator
         self.left = left
         self.right = right
+        self.parent = parent
 
     def print(self,p):
         p.print("Left",self.left)
@@ -409,13 +428,14 @@ class ExprBinary(Expr):
     def check_types(self):
         left_type = self.left.check_types()
         right_type = self.right.check_types()
-        unify_types(left_type,right_type)
+        unify_types(left_type, right_type)
         return left_type
 
 class ExprUnary(Expr):
-    def __init__(self,operator,right):
+    def __init__(self,operator,right,parent=None):
         self.operator = operator
         self.right = right
+        self.parent = parent
 
     def print(self,p):
         p.print("Operator",self.operator)
@@ -426,9 +446,10 @@ class ExprUnary(Expr):
 
 
 class ExprCall(Expr):
-    def __init__(self,name,args):
+    def __init__(self,name,args,parent=None):
         self.name = name
         self.args = args
+        self.parent = parent
 
     def print(self,p):
         p.print("Name",self.name)
