@@ -1,7 +1,11 @@
 define integer lmao()
 [
-    boolean xd -> lie
+    string xd -> lie
     while xd
     then
+        if xd
+        then
+            return "eskettit"
+        end
     end
 ]
