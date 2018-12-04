@@ -42,31 +42,33 @@ class TokenType:
     commentEnd = "comment_end"
     comma = "comma"
 
-def printMistmatchError(type1,type2):
-    if type(type1) is TypeBoolean:
-        temp1 = "boolean"
-    if type(type1) is TypeFloat:
-        temp1 = "float"
-    if type(type1) is TypeInt:
-        temp1 = "integer"
-    if type(type1) is TypeNothing:
-        temp1 = "nothing"
-    if type(type1) is TypeString:
-        temp1 = "string"
-    if type(type2) is TypeBoolean:
-        temp2 = "boolean"
-    if type(type2) is TypeFloat:
-        temp2 = "float"
-    if type(type2) is TypeInt:
-        temp2 = "integer"
-    if type(type2) is TypeNothing:
-        temp2 = "nothing"
-    if type(type2) is TypeString:
-        temp2 = "string"
-    line = type1.type.line + 1
-    print("{}.meme:{}:error:type mismatch: {} vs {}".format(sys.argv[1], line,
-                                                            temp1, temp2),
-          file=sys.stderr)
+def printMistmatchError(type1,type2,line=None):
+    if type1 is not None and type2 is not None:
+        if type(type1) is TypeBoolean:
+            temp1 = "boolean"
+        if type(type1) is TypeFloat:
+            temp1 = "float"
+        if type(type1) is TypeInt:
+            temp1 = "integer"
+        if type(type1) is TypeNothing:
+            temp1 = "nothing"
+        if type(type1) is TypeString:
+            temp1 = "string"
+        if type(type2) is TypeBoolean:
+            temp2 = "boolean"
+        if type(type2) is TypeFloat:
+            temp2 = "float"
+        if type(type2) is TypeInt:
+            temp2 = "integer"
+        if type(type2) is TypeNothing:
+            temp2 = "nothing"
+        if type(type2) is TypeString:
+            temp2 = "string"
+        if line is None:
+            line = type1.type.line + 1
+        print("{}.meme:{}:error:type mismatch: {} vs {}".format(sys.argv[1], line,
+                                                                temp1, temp2),
+              file=sys.stderr)
 
 
 def printArgsMismatchError(params_count, args_count, target):
@@ -74,10 +76,18 @@ def printArgsMismatchError(params_count, args_count, target):
                                                                      , params_count, args_count),
           file=sys.stderr)
 
+def printNotCallable(name):
+    print("{}.meme:{}:error:not a callable object".format(sys.argv[1], name.line + 1),
+          file=sys.stderr)
 
-def unify_types(type1,type2):
+def printNotVariable(value):
+    print("{}.meme:{}:error:not a variable".format(sys.argv[1], value.line + 1),
+          file=sys.stderr)
+          
+
+def unify_types(type1,type2,line=None):
     if type(type1) != type(type2):
-        printMistmatchError(type1,type2)
+        printMistmatchError(type1,type2,line)
 
 class Node:
     def __init__(self):
@@ -274,7 +284,13 @@ class ExprVar(Expr):
         self.target = scope.resolve(self.name)
 
     def check_types(self):
-        return self.target.type
+        if type(self.target) is StmtDeclaration:
+            return self.target.type
+        elif type(self.target) is FuncDefinition:
+            printNotVariable(self.name)
+        else:
+            pass
+            
 
 class Arg(Node):
     def __init__(self, arg_type, name, parent=None):
@@ -465,9 +481,10 @@ class StmtAssign(Stmt):
         self.right.resolve_names(scope)
 
     def check_types(self):
-        target_type = self.target.type
-        value_type = self.right.check_types()
-        unify_types(target_type,value_type)
+        if self.target is not None:
+            target_type = self.target.type
+            value_type = self.right.check_types()
+            unify_types(target_type,value_type)
 
 
 class StmtDeclaration(Stmt):
@@ -563,3 +580,5 @@ class ExprCall(Expr):
                 arg_type = self.args[i].check_types()
                 unify_types(param_type, arg_type)
             return self.target.type
+        else:
+            printNotCallable(self.name)

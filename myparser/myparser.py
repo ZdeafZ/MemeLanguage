@@ -342,11 +342,12 @@ class Scope:
                 self.members[name.name.value] = node
 
     def resolve(self,name):
-        if type(name) is Token:
-            if name.value in self.members:
-                return self.members[name.value]
-            elif self.parent_scope is not None:
-                return self.parent_scope.resolve(name)
-            else:
-                print("{}.meme:{}:error:undeclared variable {}".format(sys.argv[1], name.line + 1, name.value),
-                      file=sys.stderr)
+        if type(name) is not Token:
+            raise TypeError("expected token got {}".format(type(name)))
+        elif name.value in self.members:
+            return self.members[name.value]
+        elif self.parent_scope is not None:
+            return self.parent_scope.resolve(name)
+        else:
+            print("{}.meme:{}:error:undeclared variable {}".format(sys.argv[1], name.line + 1, name.value),
+                  file=sys.stderr)

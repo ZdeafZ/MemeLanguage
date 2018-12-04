@@ -1,8 +1,11 @@
 define integer lmao()
 [
-    xdd -> 11000
-    xdd
+    string something -> "xx"
+    if memeus()
+    then
+        return 5+5
+    end
 ]
-define nothing meme()
+define integer memeus()
 [
 ]
