@@ -114,9 +114,9 @@ def printNotVariable(line):
     print("{}.meme:{}:error:not a variable".format(sys.argv[1], line + 1),
           file=sys.stderr)
 
-def unify_types(type1,type2):
+def unify_types(type1,type2,line=None):
     if type(type1) != type(type2):
-        printMistmatchError(type1,type2)
+        printMistmatchError(type1,type2,line)
 
 class Node:
     def __init__(self):
