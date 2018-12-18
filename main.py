@@ -2,6 +2,7 @@ import lexer.lexer as lex
 from myparser.myparser import *
 import astPrinter.astPrinter as printer
 import sys
+import CodeGenerator.generate_code as CodeGen
 try:
     with open("{}.meme".format(str(sys.argv[1])), "r") as file:
         string = file.read()
@@ -31,6 +32,14 @@ try:
         root_scope = Scope()
         result.resolve_names(root_scope)
         result.check_types()
+    elif str(sys.argv[2] == "generate_code"):
+        root_scope = Scope()
+        result.resolve_names(root_scope)
+        result.check_types()
+        writer = CodeGen.CodeWriter()
+        result.generate_code(writer)
+        writer.dump()
+
     else:
         print("Argument not found. Argument list can be found in the README", file=sys.stderr)
 except IndexError:
@@ -39,4 +48,5 @@ except IndexError:
     root_scope = Scope()
     result.resolve_names(root_scope)
     result.check_types()
-
+    writer = CodeGen.CodeWriter()
+#    result.generate_code(writer)

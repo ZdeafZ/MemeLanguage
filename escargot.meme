@@ -1,8 +1,11 @@
-define integer lmao()
+define integer lmao(integer meme)
 [
-    xdd -> 11000
-    xdd
+    while(10)
+    then
+        continue
+    end
+    escarg(10,30)
 ]
-define nothing meme()
+define string escarg(integer memelus, integer faggotus)
 [
 ]

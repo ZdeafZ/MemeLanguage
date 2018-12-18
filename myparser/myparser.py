@@ -177,10 +177,12 @@ class Parser:
         eifcond = None
         eifbody = None
         self.expectKeyword("if")
+        self.expect(TokenType.leftParenthesis)
         cond = self.parse_stmt_expr()
+        self.expect(TokenType.rightParenthesis)
         self.expect(TokenType.newLine)
         body = self.parse_stmt_body()
-        branches.append(Branch(cond,body))
+        branches.append(Branch(cond, body))
         if self.peekAtTokens().value == "elseif":
             self.expect(TokenType.newLine)
         while self.currentToken().value == "elseif":
@@ -199,7 +201,9 @@ class Parser:
 
     def parse_while_stmt(self):
         self.expect(TokenType.keyword)
+        self.expect(TokenType.leftParenthesis)
         cond = self.parse_stmt_expr()
+        self.expect(TokenType.rightParenthesis)
         self.expect(TokenType.newLine)
         body = None
         if self.currentToken().value == "then":
@@ -260,7 +264,7 @@ class Parser:
             if result is None:
                 break
             right = self.parse_logical_and_expr()
-            left = ExprBinary(left, result, right)
+            left = ExprBinaryLogical(left, result, right)
         return left
     
     def parse_logical_and_expr(self):
@@ -270,17 +274,23 @@ class Parser:
             if result is None:
                 break
             right = self.parse_comparsion_expr()
-            left = ExprBinary(left, result, right)
+            left = ExprBinaryLogical(left, result, right)
         return left
         
     def parse_comparsion_expr(self):
         left = self.parse_add_expr()
         while True:
-            result = self.accept(TokenType.greaterThan)
-            if result is None:
+            if self.currentToken().type in self.compOperators:
+                result = self.accept(self.currentToken().type)
+                if result is None:
+                    break
+                right = self.parse_add_expr()
+                if result == TokenType.equal or result == TokenType.notEqual:
+                    left = ExprBinaryEquality(left, result, right)
+                else:
+                    left = ExprBinaryRelational(left, result, right)
+            else:
                 break
-            right = self.parse_add_expr()
-            left = ExprBinary(left, result, right)
         return left
 
     def parse_add_expr(self):
@@ -291,7 +301,7 @@ class Parser:
                 if result is None:
                     break
                 right = self.parse_mult_expr()
-                left = ExprBinary(left, result, right)
+                left = ExprBinaryArithmetic(left, result, right)
             else:
                 break
         return left
@@ -304,7 +314,7 @@ class Parser:
                 if result is None:
                     break
                 right = self.parse_unary_expr()
-                left = ExprBinary(left, result, right)
+                left = ExprBinaryArithmetic(left, result, right)
             else:
                 break
         return left
@@ -326,8 +336,13 @@ class Scope:
     def add(self,name,node):
         if type(name) is not Token:
             raise TypeError("expected token got {}".format(type(name)))
-        if not issubclass(type(node),Node):
+        if not issubclass(type(node), Node):
             raise TypeError("expected node got {}".format(type(node)))
+        if hasattr(node,"stack_slot"):
+            global current_stack_slot
+            node.stack_slot = current_stack_slot
+            current_stack_slot += 1
+
         if type(name) is Token:
             if name.value in self.members:
                 print("{}.meme:{}:error:duplicate variable {}".format(sys.argv[1], name.line + 1, name.value),

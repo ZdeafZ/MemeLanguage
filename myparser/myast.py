@@ -1,5 +1,6 @@
 import sys
-
+import CodeGenerator.generate_code as CodeGen
+current_stack_slot = 0
 
 class TokenType:
 
@@ -42,7 +43,31 @@ class TokenType:
     commentEnd = "comment_end"
     comma = "comma"
 
-def printMistmatchError(type1,type2):
+aritOperators = [
+    TokenType.plus,
+    TokenType.minus,
+    TokenType.mult,
+    TokenType.div
+]
+
+logicalOperators = [
+    TokenType.logicalAnd,
+    TokenType.logicalOr
+]
+relationOperators = [
+    TokenType.greaterThan,
+    TokenType.greaterThanOrEqual,
+    TokenType.lessThanOrEqual,
+    TokenType.lessThan,
+]
+equalityOperators = [
+    TokenType.equal,
+    TokenType.notEqual
+]
+
+def printMistmatchError(type1, type2):
+    temp1 = None
+    temp2 = None
     if type(type1) is TypeBoolean:
         temp1 = "boolean"
     if type(type1) is TypeFloat:
@@ -68,12 +93,26 @@ def printMistmatchError(type1,type2):
                                                             temp1, temp2),
           file=sys.stderr)
 
+def printInvalidOperationError(line):
+    print("{}.meme:{}:error:invalid binary operation".format(sys.argv[1], line +1),
+         file=sys.stderr)
+
+def printVoidError(type):
+    print("{}.meme:{}:error:type cannot be Nothing".format(sys.argv[1], type.type.line +1),
+          file=sys.stderr)
 
 def printArgsMismatchError(params_count, args_count, target):
     print("{}.meme:{}:error:invalid argument count: {} vs {}".format(sys.argv[1], target.name.line + 1
                                                                      , params_count, args_count),
           file=sys.stderr)
 
+def printNotACall(line):
+    print("{}.meme:{}:error:not a call".format(sys.argv[1], line + 1),
+          file=sys.stderr)
+
+def printNotVariable(line):
+    print("{}.meme:{}:error:not a variable".format(sys.argv[1], line + 1),
+          file=sys.stderr)
 
 def unify_types(type1,type2):
     if type(type1) != type(type2):
@@ -117,6 +156,9 @@ class Node:
             current = current.parent
         return current
 
+    def generate_code(self, w):
+        print("not implemented for class {}", self.__class__.__name__)
+
 
 class FuncDefinition(Node):
     def __init__ (self, rtype, name, params, body, parent=None):
@@ -128,6 +170,7 @@ class FuncDefinition(Node):
         self.funcbody = body
         self.add_children(self.funcbody)
         self.parent = parent
+        self.entry_label = CodeGen.Label()
 
     def print(self,p):
         p.print("Type",self.type)
@@ -138,12 +181,19 @@ class FuncDefinition(Node):
     def resolve_names(self,scope):
         import myparser.myparser as parser
         inner_scope = parser.Scope(scope)
+        global current_stack_slot
+        current_stack_slot = 0
         for args in self.params:
             inner_scope.add(args.name,args)
         self.funcbody.resolve_names(inner_scope)
 
     def check_types(self):
         self.funcbody.check_types()
+
+    def generate_code(self, w):
+        w.place_label(self.entry_label)
+        self.funcbody.generate_code(w)
+        w.write("RET")
 
 
 class Functions(Node):
@@ -169,6 +219,9 @@ class Functions(Node):
         for func in self.functions:
             func.check_types()
 
+    def generate_code(self, w):
+        for function in self.functions:
+            function.generate_code(w)
 
 class Type(Node):
     pass
@@ -239,6 +292,12 @@ class ExprPriority(Expr):
     def resolve_names(self,scope):
         self.exprs.resolve_names(scope)
 
+    def check_types(self):
+        self.exprs.check_types()
+
+    def generate_code(self, w):
+        self.exprs.generate_code(w)
+
 
 class ExprConstant(Expr):
     def __init__ (self, lit, parent=None):
@@ -261,6 +320,9 @@ class ExprConstant(Expr):
         elif self.lit.type == TokenType.booleanLiteral:
             return TypeBoolean(self.lit)
 
+    def generate_code(self, w):
+        w.write("PUSH",int(self.lit.value))
+
 
 class ExprVar(Expr):
     def __init__(self, name, parent=None):
@@ -274,17 +336,28 @@ class ExprVar(Expr):
         self.target = scope.resolve(self.name)
 
     def check_types(self):
-        return self.target.type
+        if type(self.target) is StmtDeclaration and self.target is not None:
+            return self.target.type
+        else:
+            printNotVariable(self.name.line)
+
+    def generate_code(self, w):
+        if hasattr(self.target,"stack_slot"):
+            w.write("PEEK", self.target.stack_slot)
+        else:
+            w.write("PEEK", "ERROR")
 
 class Arg(Node):
-    def __init__(self, arg_type, name, parent=None):
-        self.arg_type = arg_type
-        self.add_children(arg_type)
+    def __init__(self, type, name, parent=None):
+        self.type = type
+        self.add_children(type)
         self.name = name
         self.parent = parent
+        self.stack_slot = 0
+
 
     def print(self,p):
-        p.print("Arg Type",self.arg_type)
+        p.print("Arg Type",self.type)
         p.print("Name",self.name)
 
 
@@ -313,6 +386,11 @@ class Branch(Stmt):
         unify_types(cond_type,TypeBoolean(None))
         self.body.check_types()
 
+    def generate_code(self, w):
+        self.cond.generate_code(w)
+        self.body.generate_code(w)
+
+
 class StmtBlock(Stmt):
     def __init__(self, parent=None):
         self.stmts = []
@@ -335,6 +413,10 @@ class StmtBlock(Stmt):
         for stmt in self.stmts:
             stmt.check_types()
 
+    def generate_code(self, w):
+        for stmt in self.stmts:
+            stmt.generate_code(w)
+
 
 class StmtExpr(Stmt):
     def __init__(self,expr,parent=None):
@@ -350,6 +432,10 @@ class StmtExpr(Stmt):
 
     def check_types(self):
         return self.expr.check_types()
+
+    def generate_code(self, w):
+        self.expr.generate_code(w)
+        w.write("POP")
 
 
 class StmtReturn(Stmt):
@@ -370,7 +456,15 @@ class StmtReturn(Stmt):
         else:
             value_type = TypeNothing(self.value)
         ret_type = self.ancestor_fn().type
-        unify_types(value_type, ret_type)
+        if value_type is not None:
+            unify_types(value_type, ret_type)
+
+    def generate_code(self, w):
+        if self.value is not None:
+            self.value.generate_code(w)
+            w.write("RET_V")
+        else:
+            w.write("RET")
 
 
 class StmtContinue(Stmt):
@@ -387,6 +481,9 @@ class StmtContinue(Stmt):
     def check_types(self):
         if self.ancestor_loop() is None:
             print("continue is not in loop faggot")
+
+    def generate_code(self, w):
+        w.write("CNT", self.ancestor_loop().end_label)
 
 class StmtIf(Stmt):
     def __init__(self, branches, body, parent=None):
@@ -412,6 +509,12 @@ class StmtIf(Stmt):
         if self.body is not None:
             self.body.check_types()
 
+    def generate_code(self, w):
+        for branch in self.branches:
+            branch.generate_code(w)
+        if self.body is not None:
+            self.body.generate_code()
+
 class StmtBreak(Stmt):
     def __init__(self,token, parent=None):
         self.token = token
@@ -426,6 +529,10 @@ class StmtBreak(Stmt):
     def check_types(self):
         if self.ancestor_loop() is None:
             print("break not in loop faggot")
+
+    def generate_code(self, w):
+        w.write("BR",self.ancestor_loop().end_label)
+
 
 class StmtWhile(Stmt):
     def __init__(self, cond, body, parent=None):
@@ -448,6 +555,16 @@ class StmtWhile(Stmt):
         unify_types(cond_type, TypeBoolean(None))
         self.body.check_types()
 
+    def generate_code(self, w):
+        self.start_label = w.new_label_placed()
+        self.cond.generate_code(w)
+        self.end_label = w.new_label()
+        w.write("BZ", self.end_label)
+        self.body.generate_code(w)
+        w.write("BR", self.start_label)
+        w.place_label(self.end_label)
+
+
 class StmtAssign(Stmt):
     def __init__(self,name,operator,right,parent=None):
         self.name = name
@@ -465,10 +582,14 @@ class StmtAssign(Stmt):
         self.right.resolve_names(scope)
 
     def check_types(self):
-        target_type = self.target.type
-        value_type = self.right.check_types()
-        unify_types(target_type,value_type)
+        if self.target is not None:
+            target_type = self.target.type
+            value_type = self.right.check_types()
+            unify_types(target_type,value_type)
 
+    def generate_code(self, w):
+        self.right.generate_code(w)
+        w.write("POKE",self.target.stack_slot)
 
 class StmtDeclaration(Stmt):
     def __init__(self,type,name,operator,right,parent=None):
@@ -478,6 +599,7 @@ class StmtDeclaration(Stmt):
         self.operator = operator
         self.right = right
         self.parent = parent
+        self.stack_slot = 0
 
     def print(self, p):
         p.print("Type", self.type)
@@ -494,6 +616,11 @@ class StmtDeclaration(Stmt):
         target_type = self.target.type
         value_type = self.right.check_types()
         unify_types(target_type,value_type)
+
+    def generate_code(self, w):
+        self.right.generate_code(w)
+        w.write("POKE",self.target.stack_slot)
+
 
 class ExprBinary(Expr):
     def __init__(self,left,operator,right,parent=None):
@@ -518,6 +645,166 @@ class ExprBinary(Expr):
         right_type = self.right.check_types()
         unify_types(left_type, right_type)
         return left_type
+
+
+class ExprBinaryArithmetic(Expr):
+    def __init__(self,left,operator,right,parent=None):
+        self.operator = operator
+        self.left = left
+        self.add_children(self.left)
+        self.right = right
+        self.add_children(self.right)
+        self.parent = parent
+
+    def print(self,p):
+        p.print("Left",self.left)
+        p.print("Operator",self.operator)
+        p.print("Right",self.right)
+
+    def resolve_names(self,scope):
+        self.left.resolve_names(scope)
+        self.right.resolve_names(scope)
+
+    def check_types(self):
+        left_type = self.left.check_types()
+        right_type = self.right.check_types()
+        unify_types(left_type, right_type)
+        return left_type
+
+    def generate_code(self, w):
+        self.left.generate_code(w)
+        self.right.generate_code(w)
+        if self.operator.type == TokenType.plus:
+            w.write("ADD")
+        elif self.operator.type == TokenType.minus:
+            w.write("SUB")
+        elif self.operator.type == TokenType.div:
+            w.write("DIV")
+        elif self.operator.type == TokenType.mult:
+            w.write("MULT")
+        else:
+            printInvalidOperationError(self.operator.line)
+
+class ExprBinaryLogical(Expr):
+    def __init__(self,left,operator,right,parent=None):
+        self.operator = operator
+        self.left = left
+        self.add_children(self.left)
+        self.right = right
+        self.add_children(self.right)
+        self.parent = parent
+
+    def print(self,p):
+        p.print("Left",self.left)
+        p.print("Operator",self.operator)
+        p.print("Right",self.right)
+
+    def resolve_names(self,scope):
+        self.left.resolve_names(scope)
+        self.right.resolve_names(scope)
+
+    def check_types(self):
+        left_type = self.left.check_types()
+        right_type = self.right.check_types()
+        unify_types(left_type, TypeBoolean(None))
+        unify_types(right_type, TypeBoolean(None))
+        return TypeBoolean(None)
+
+    def generate_code(self, w):
+        self.left.generate_code(w)
+        self.right.generate_code(w)
+        if self.operator.type == TokenType.logicalAnd:
+            w.write("AND")
+        elif self.operator.type == TokenType.logicalOr:
+            w.write("OR")
+        else:
+            printInvalidOperationError(self.operator.line)
+
+
+class ExprBinaryEquality(Expr):
+    def __init__(self,left,operator,right,parent=None):
+        self.operator = operator
+        self.left = left
+        self.add_children(self.left)
+        self.right = right
+        self.add_children(self.right)
+        self.parent = parent
+
+    def print(self,p):
+        p.print("Left",self.left)
+        p.print("Operator",self.operator)
+        p.print("Right",self.right)
+
+    def resolve_names(self,scope):
+        self.left.resolve_names(scope)
+        self.right.resolve_names(scope)
+
+    def check_types(self):
+        left_type = self.left.check_types()
+        right_type = self.right.check_types()
+        if left_type != TypeNothing(None) and right_type != TypeNothing(None):
+            unify_types(left_type, right_type)
+        if left_type == TypeNothing(None):
+            printVoidError(left_type)
+        if right_type == TypeNothing(None):
+            printVoidError(right_type)
+        return TypeBoolean(None)
+
+    def generate_code(self, w):
+        self.left.generate_code(w)
+        self.right.generate_code(w)
+        if self.operator.type == TokenType.equal:
+            w.write("EQ")
+        elif self.operator.type == TokenType.notEqual:
+            w.write("NEQ")
+        else:
+            printInvalidOperationError(self.operator.line)
+
+
+class ExprBinaryRelational(Expr):
+    def __init__(self,left,operator,right,parent=None):
+        self.operator = operator
+        self.left = left
+        self.add_children(self.left)
+        self.right = right
+        self.add_children(self.right)
+        self.parent = parent
+
+    def print(self,p):
+        p.print("Left",self.left)
+        p.print("Operator",self.operator)
+        p.print("Right",self.right)
+
+    def resolve_names(self,scope):
+        self.left.resolve_names(scope)
+        self.right.resolve_names(scope)
+
+    def check_types(self):
+        left_type = self.left.check_types()
+        right_type = self.right.check_types()
+        if left_type != TypeNothing(None) and right_type != TypeNothing(None):
+            unify_types(left_type, right_type)
+        if left_type == TypeNothing(None):
+            printVoidError(left_type)
+        if right_type == TypeNothing(None):
+            printVoidError(right_type)
+        return TypeBoolean(None)
+
+    def generate_code(self, w):
+        self.left.generate_code(w)
+        self.right.generate_code(w)
+        if self.operator.type == TokenType.greaterThan:
+            w.write("GR")
+        elif self.operator.type == TokenType.greaterThanOrEqual:
+            w.write("GREQ")
+        elif self.operator.type == TokenType.lessThan:
+            w.write("LS")
+        elif self.operator.type == TokenType.lessThanOrEqual:
+            w.wirte("LSEQ")
+        else:
+            printInvalidOperationError(self.operator.line)
+
+
 
 class ExprUnary(Expr):
     def __init__(self,operator,right,parent=None):
@@ -559,7 +846,19 @@ class ExprCall(Expr):
 
             mininum = min(params_count, args_count)
             for i in range (0,mininum):
-                param_type = self.target.params[i].arg_type
+                param_type = self.target.params[i].type
                 arg_type = self.args[i].check_types()
                 unify_types(param_type, arg_type)
             return self.target.type
+        else:
+            printNotACall(self.name.line)
+
+    def generate_code(self, w):
+        if hasattr(self.target,"entry_label"):
+            w.write("PUSH", self.target.entry_label)
+        else:
+            w.write("PUSH", "ERROR")
+
+        for arg in self.args:
+            arg.generate_code(w)
+        w.write("CALL",len(self.args))
