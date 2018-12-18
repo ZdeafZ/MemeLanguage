@@ -35,10 +35,14 @@ try:
     elif str(sys.argv[2] == "generate_code"):
         root_scope = Scope()
         result.resolve_names(root_scope)
-        result.check_types()
-        writer = CodeGen.CodeWriter()
-        result.generate_code(writer)
-        writer.dump()
+        if getErrorFoundStatus():
+            result.check_types()
+        if getErrorFoundStatus():
+            result.check_main()
+        if getErrorFoundStatus():
+            writer = CodeGen.CodeWriter()
+            result.generate_code(writer)
+            writer.dump()
 
     else:
         print("Argument not found. Argument list can be found in the README", file=sys.stderr)

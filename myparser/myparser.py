@@ -187,7 +187,9 @@ class Parser:
             self.expect(TokenType.newLine)
         while self.currentToken().value == "elseif":
             self.expectKeyword("elseif")
+            self.expect(TokenType.leftParenthesis)
             eifcond = self.parse_stmt_expr()
+            self.expect(TokenType.rightParenthesis)
             self.expect(TokenType.newLine)
             eifbody = self.parse_stmt_body()
             branches.append(Branch(eifcond, eifbody))
@@ -214,7 +216,7 @@ class Parser:
         type = self.parse_type()
         name = self.parse_ident()
         operator = self.expect(TokenType.assign)
-        right = self.parse_stmt_expr()
+        right = self.parse_expr()
         return StmtDeclaration(type, name, operator, right)
 
     def parse_priority_expr(self):
@@ -230,11 +232,11 @@ class Parser:
             call = self.accept(TokenType.leftParenthesis)
             args = []
             if op is not None:
-                right = self.parse_stmt_expr()
+                right = self.parse_expr()
                 return StmtAssign(name, op, right)
             elif call is not None:
                 while self.accept(TokenType.rightParenthesis) is None:
-                    args.append(self.parse_stmt_expr())
+                    args.append(self.parse_expr())
                     self.accept(TokenType.comma)
                 return ExprCall(name,args)
             return ExprVar(name)
@@ -256,6 +258,10 @@ class Parser:
     def parse_stmt_expr(self):
         expr = self.parse_logical_or_expr()
         return StmtExpr(expr)
+        
+    def parse_expr(self):
+        expr = self.parse_logical_or_expr()
+        return Expr(expr)
         
     def parse_logical_or_expr(self):
         left = self.parse_logical_and_expr()
@@ -285,7 +291,7 @@ class Parser:
                 if result is None:
                     break
                 right = self.parse_add_expr()
-                if result == TokenType.equal or result == TokenType.notEqual:
+                if result.type == TokenType.equal or result.type == TokenType.notEqual:
                     left = ExprBinaryEquality(left, result, right)
                 else:
                     left = ExprBinaryRelational(left, result, right)

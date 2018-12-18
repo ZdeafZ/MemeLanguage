@@ -1,11 +1,17 @@
-define integer lmao(integer meme)
+define nothing main()
 [
-    while(10)
+    integer a -> 10
+    if(lie)
     then
-        continue
+        a -> 20
     end
-    escarg(10,30)
-]
-define string escarg(integer memelus, integer faggotus)
-[
+    elseif(truth)
+    then
+        a -> 30
+    end
+    else
+    then
+        a -> 40
+    end
+    a -> 50
 ]

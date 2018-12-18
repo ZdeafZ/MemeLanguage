@@ -2,6 +2,11 @@ import sys
 import CodeGenerator.generate_code as CodeGen
 current_stack_slot = 0
 
+stringMap = {}
+currentStringConstant = 0
+mainIndex = 0
+noErrors = True
+
 class TokenType:
 
     identifier = "identifier"
@@ -64,8 +69,19 @@ equalityOperators = [
     TokenType.equal,
     TokenType.notEqual
 ]
-
-def printMistmatchError(type1, type2):
+def getErrorFoundStatus():
+    return noErrors
+def printNotInLoopError(instruction,line):
+    global noErrors
+    noErrors = False
+    print("{}.meme:{}:error:{} not in loop".format(sys.argv[1], line+1, instruction),
+          file=sys.stderr)
+def printMainNotFoundError(line):
+    global noErrors
+    noErrors = False
+    print("{}.meme:{}:error:main function not found".format(sys.argv[1], line+1),
+          file=sys.stderr)
+def printMismatchError(type1, type2,line = None):
     temp1 = None
     temp2 = None
     if type(type1) is TypeBoolean:
@@ -89,34 +105,54 @@ def printMistmatchError(type1, type2):
     if type(type2) is TypeString:
         temp2 = "string"
     line = type1.type.line + 1
+    global noErrors
+    noErrors = False
     print("{}.meme:{}:error:type mismatch: {} vs {}".format(sys.argv[1], line,
                                                             temp1, temp2),
           file=sys.stderr)
 
 def printInvalidOperationError(line):
+    global noErrors
+    noErrors = False
     print("{}.meme:{}:error:invalid binary operation".format(sys.argv[1], line +1),
          file=sys.stderr)
 
 def printVoidError(type):
+    global noErrors
+    noErrors = False
     print("{}.meme:{}:error:type cannot be Nothing".format(sys.argv[1], type.type.line +1),
           file=sys.stderr)
 
 def printArgsMismatchError(params_count, args_count, target):
+    global noErrors
+    noErrors = False
     print("{}.meme:{}:error:invalid argument count: {} vs {}".format(sys.argv[1], target.name.line + 1
                                                                      , params_count, args_count),
           file=sys.stderr)
-
+def printMainArgsMismatchError(params_count, args_count,line):
+    global noErrors
+    noErrors = False
+    print("{}.meme:{}:error:invalid argument count: {} vs {}".format(sys.argv[1], line
+                                                                     , params_count, args_count),
+          file=sys.stderr)
 def printNotACall(line):
+    global noErrors
+    noErrors = False
     print("{}.meme:{}:error:not a call".format(sys.argv[1], line + 1),
           file=sys.stderr)
 
 def printNotVariable(line):
+    global noErrors
+    noErrors = False
     print("{}.meme:{}:error:not a variable".format(sys.argv[1], line + 1),
           file=sys.stderr)
 
 def unify_types(type1,type2,line=None):
     if type(type1) != type(type2):
-        printMistmatchError(type1,type2,line)
+        printMismatchError(type1,type2,line)
+        return False
+    else:
+        return True
 
 class Node:
     def __init__(self):
@@ -220,8 +256,29 @@ class Functions(Node):
             func.check_types()
 
     def generate_code(self, w):
+        global mainIndex
+        if mainIndex == -1:
+            sys.exit()
         for function in self.functions:
             function.generate_code(w)
+            
+    def check_main(self):
+        global mainIndex
+        mainIndex = -1
+        counter = 0
+        for function in self.functions:
+            if function.name.value == "main":
+                if unify_types(function.type,TypeNothing(None)):
+                    if len(function.params) == 0: 
+                        mainIndex = counter
+                        break
+                    else:
+                        printMainArgsMismatchError(len(function.params),0,function.name.line + 1)
+            counter += 1
+        if mainIndex == -1:
+            printMainNotFoundError(0)
+        return mainIndex
+            
 
 class Type(Node):
     pass
@@ -276,8 +333,22 @@ class TypeCharacter(Type):
 
 
 class Expr(Node):
+    def __init__(self,expr,parent=None):
+        self.expr = expr
+        self.parent = parent
+
     def print(self,p):
-        p.print("CLASS NOT IMPLEMENTED")
+        p.print("Expression",self.expr)
+
+    def resolve_names(self,scope):
+        if self.expr is not None:
+            self.expr.resolve_names(scope)
+
+    def check_types(self):
+        return self.expr.check_types()
+
+    def generate_code(self, w):
+        self.expr.generate_code(w)
 
 
 class ExprPriority(Expr):
@@ -316,12 +387,25 @@ class ExprConstant(Expr):
         elif self.lit.type == TokenType.floatLiteral:
             return TypeFloat(self.lit)
         elif self.lit.type == TokenType.stringLiteral:
+            if self.lit.value not in stringMap:
+                global currentStringConstant
+                stringMap[self.lit.value] = currentStringConstant
+                currentStringConstant += 1
             return TypeString(self.lit)
         elif self.lit.type == TokenType.booleanLiteral:
             return TypeBoolean(self.lit)
 
     def generate_code(self, w):
-        w.write("PUSH",int(self.lit.value))
+        if self.lit.type == TokenType.integerLiteral:
+            w.write("PUSH",int(self.lit.value))
+        elif self.lit.type == TokenType.booleanLiteral:
+            if self.lit.value == "truth":
+                w.write("PUSH",1)
+            elif self.lit.value =="lie":
+                w.write("PUSH",0)
+        elif self.lit.type == TokenType.stringLiteral:
+            w.write("PUSH",stringMap[self.lit.value])
+        
 
 
 class ExprVar(Expr):
@@ -389,6 +473,7 @@ class Branch(Stmt):
     def generate_code(self, w):
         self.cond.generate_code(w)
         self.body.generate_code(w)
+        w.new_label()
 
 
 class StmtBlock(Stmt):
@@ -437,7 +522,6 @@ class StmtExpr(Stmt):
         self.expr.generate_code(w)
         w.write("POP")
 
-
 class StmtReturn(Stmt):
     def __init__(self, value, parent=None):
         self.value = value
@@ -480,10 +564,10 @@ class StmtContinue(Stmt):
 
     def check_types(self):
         if self.ancestor_loop() is None:
-            print("continue is not in loop faggot")
+            printNotInLoopError("continue",self.token.line)
 
     def generate_code(self, w):
-        w.write("CNT", self.ancestor_loop().end_label)
+        w.write("CNT", self.ancestor_loop().start_label)
 
 class StmtIf(Stmt):
     def __init__(self, branches, body, parent=None):
@@ -513,7 +597,7 @@ class StmtIf(Stmt):
         for branch in self.branches:
             branch.generate_code(w)
         if self.body is not None:
-            self.body.generate_code()
+            self.body.generate_code(w)
 
 class StmtBreak(Stmt):
     def __init__(self,token, parent=None):
@@ -528,7 +612,7 @@ class StmtBreak(Stmt):
 
     def check_types(self):
         if self.ancestor_loop() is None:
-            print("break not in loop faggot")
+            printNotInLoopError("break",self.token.line)
 
     def generate_code(self, w):
         w.write("BR",self.ancestor_loop().end_label)

@@ -1,8 +1,9 @@
 from CodeGenerator.instructions import instructions_by_name,instructions_by_opcode
 
 class Label:
-    def __init__(self):
+    def __init__(self, value = None):
         self.offsets = []
+        self.value = value
 
 class CodeWriter:
 
@@ -18,7 +19,7 @@ class CodeWriter:
         while offset in range(0,len(self.code)):
             opcode = self.code[offset]
             instr_descr = instructions_by_opcode[opcode]
-            ops = self.code[offset + 1: offset +1 + instr_descr.op_count]
+            ops = self.code[offset + 1: offset + 1 + instr_descr.op_count]
             print("{:<5} {:10} {}".format(offset,instr_descr.name,ops))
             offset += 1 + instr_descr.op_count
 
@@ -29,10 +30,10 @@ class CodeWriter:
             print("bullshit operand count")
         self.code.append(instr_descr.opcode)
         for op in ops:
-            if op is not Label:
+            if not isinstance(op,Label):
                 self.code.append(op)
             elif op.value is None:
-                op.offsets << len(self.code)
+                op.offsets.append(len(self.code))
                 self.code.append(123123)
             else:
                 self.code.append(op.value)
