@@ -53,4 +53,5 @@ except IndexError:
     result.resolve_names(root_scope)
     result.check_types()
     writer = CodeGen.CodeWriter()
-#    result.generate_code(writer)
+    result.generate_code(writer)
+

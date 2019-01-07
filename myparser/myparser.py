@@ -355,7 +355,7 @@ class Scope:
                       file=sys.stderr)
             else:
                 self.members[name.value] = node
-        elif name is Node:
+        elif type(name) is Node:
             if name.name.value in self.members:
                 print("{}.meme:{}:error:duplicate variable {}".format(sys.argv[1], name.name.line + 1, name.name.value),
                       file=sys.stderr)

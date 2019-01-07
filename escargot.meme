@@ -1,17 +1,8 @@
 define nothing main()
 [
-    integer a -> 10
-    if(lie)
+    integer a -> 5
+    integer b -> 6
+    if(a < b)
     then
-        a -> 20
     end
-    elseif(truth)
-    then
-        a -> 30
-    end
-    else
-    then
-        a -> 40
-    end
-    a -> 50
 ]

@@ -471,10 +471,13 @@ class Branch(Stmt):
         self.body.check_types()
 
     def generate_code(self, w):
+        self.start_label = w.new_label_placed()
+        self.end_label = w.new_label()
         self.cond.generate_code(w)
+        w.write("BZ", self.end_label)
         self.body.generate_code(w)
-        w.new_label()
-
+        w.write("BR", self.parent.final_label)
+        w.place_label(self.end_label)
 
 class StmtBlock(Stmt):
     def __init__(self, parent=None):
@@ -516,11 +519,14 @@ class StmtExpr(Stmt):
             self.expr.resolve_names(scope)
 
     def check_types(self):
-        return self.expr.check_types()
+        if self.expr is not None:
+            return self.expr.check_types()
 
     def generate_code(self, w):
         self.expr.generate_code(w)
-        w.write("POP")
+        if type(self.expr) is ExprConstant:
+            w.write("POP")
+
 
 class StmtReturn(Stmt):
     def __init__(self, value, parent=None):
@@ -594,10 +600,15 @@ class StmtIf(Stmt):
             self.body.check_types()
 
     def generate_code(self, w):
+        self.final_label = w.new_label()
         for branch in self.branches:
             branch.generate_code(w)
         if self.body is not None:
+            w.write("BR", self.final_label)
+            w.place_label(self.final_label)
             self.body.generate_code(w)
+        else:
+            w.place_label(self.final_label)
 
 class StmtBreak(Stmt):
     def __init__(self,token, parent=None):
@@ -941,7 +952,7 @@ class ExprCall(Expr):
         if hasattr(self.target,"entry_label"):
             w.write("PUSH", self.target.entry_label)
         else:
-            w.write("PUSH", "ERROR")
+            w.write("PUSH", -1)
 
         for arg in self.args:
             arg.generate_code(w)
