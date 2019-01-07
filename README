@@ -7,6 +7,6 @@ args = lex, parse, resolve, check_types
   parse - displays only the Abstract Syntax Tree.
   resolve - resolves names, find duplicates or non-declared ones
   check_types - resolves names, and checks whether types match.
-  generate_code - generates binary and textual form.
+  generate_code - generates binary and textual form of machine code
   no args - does everything.
 BNF and eBNF stores the grammar.
