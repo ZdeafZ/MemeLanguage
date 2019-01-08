@@ -2,17 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7ec70ffa-5c3e-4b39-88ae-b4de0810333e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/lexer/Grammar/BNF'as.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/Grammar/eBNF'as.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myAstPrinter/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myAstPrinter/astPrinter.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myLexer/escargot.meme" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myLexer/keywords.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myLexer/lexer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myLexer/operators.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myParser/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myParser/parser.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/myParser/parserv2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/MemeLanguage.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeGenerator/generate_code.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CodeGenerator/instructions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/astPrinter/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/astPrinter/astPrinter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/grammar/BNF'as.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/grammar/eBNF'as.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lexer/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lexer/keywords.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lexer/lexer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lexer/operators.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myparser/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/myparser/myast.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/myparser/myparser.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,44 +32,46 @@
     <session id="-596704444">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="24" />
+          <entry key="project.closed" value="32" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.10" value="4" />
           <entry key="project.open.time.12" value="1" />
           <entry key="project.open.time.2" value="3" />
-          <entry key="project.open.time.3" value="7" />
+          <entry key="project.open.time.3" value="14" />
           <entry key="project.open.time.4" value="3" />
           <entry key="project.open.time.7" value="1" />
           <entry key="project.open.time.8" value="2" />
-          <entry key="project.open.time.9" value="2" />
-          <entry key="project.opened" value="24" />
+          <entry key="project.open.time.9" value="3" />
+          <entry key="project.opened" value="32" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="README" value="1" />
-          <entry key="meme" value="2" />
-          <entry key="py" value="30" />
-          <entry key="txt" value="11" />
+          <entry key="meme" value="4" />
+          <entry key="py" value="41" />
+          <entry key="txt" value="15" />
+          <entry key="xml" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="PLAIN_TEXT" value="14" />
-          <entry key="Python" value="30" />
+          <entry key="PLAIN_TEXT" value="20" />
+          <entry key="Python" value="41" />
+          <entry key="XML" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="meme" value="1101" />
-          <entry key="py" value="13711" />
-          <entry key="txt" value="78" />
+          <entry key="meme" value="1938" />
+          <entry key="py" value="14589" />
+          <entry key="txt" value="89" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="1179" />
-          <entry key="Python" value="13711" />
+          <entry key="PLAIN_TEXT" value="2027" />
+          <entry key="Python" value="14589" />
         </counts>
       </usages-collector>
     </session>
@@ -69,10 +79,15 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/parser/parser.py">
+        <entry file="file://$PROJECT_DIR$/meme_parser/parser.py">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/meme_ast/ast.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
+            <state relative-caret-position="17">
+              <caret line="504" column="31" selection-start-line="504" selection-start-column="31" selection-end-line="504" selection-end-column="31" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -81,43 +96,49 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/parser/__init__.py">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/escargot.meme">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lexer/operators.txt">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/meme_ast_printer/printer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="340">
+              <caret line="20" selection-start-line="20" selection-end-line="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/meme_codegen/generate_code.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="24" column="1" selection-start-line="24" selection-start-column="1" selection-end-line="24" selection-end-column="1" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/lexer/lexer.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="26" selection-start-line="2" selection-start-column="26" selection-end-line="2" selection-end-column="26" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/astPrinter/astPrinter.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="39" selection-start-line="7" selection-start-column="39" selection-end-line="7" selection-end-column="39" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/parser/ast.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+            <state relative-caret-position="453">
+              <caret line="57" lean-forward="true" selection-start-line="57" selection-end-line="57" />
+              <folding>
+                <element signature="e#0#30#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/meme_lexer/lexer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="21" selection-start-column="21" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -140,6 +161,28 @@
       <find>leftBrace</find>
       <find>leftBracket</find>
       <find>logical_and_op</find>
+      <find>While</find>
+      <find>branches</find>
+      <find>elseif</find>
+      <find>new_label_placed</find>
+      <find>BR</find>
+      <find>Branches</find>
+      <find>Branch</find>
+      <find>StmtWhile</find>
+      <find>StmtIf</find>
+      <find>Stmt</find>
+      <find>scope.add</find>
+      <find>Scope</find>
+      <find>scope.resolve</find>
+      <find>ExprVar</find>
+      <find>StmtBlock</find>
+      <find>STmtExpr</find>
+      <find>LS</find>
+      <find>POP</find>
+      <find>stringMap</find>
+      <find>StmtExpr</find>
+      <find>resolve</find>
+      <find>PUSH</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -161,14 +204,24 @@
         <option value="$PROJECT_DIR$/lexer/myParser/parserv2.py" />
         <option value="$PROJECT_DIR$/parser/parser.py" />
         <option value="$PROJECT_DIR$/astPrinter/astPrinter.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/lexer/lexer.py" />
+        <option value="$PROJECT_DIR$/myparser/myparser.py" />
+        <option value="$PROJECT_DIR$/escargot.meme" />
+        <option value="$PROJECT_DIR$/myparser/myast.py" />
+        <option value="$PROJECT_DIR$/meme_parser/parser.py" />
+        <option value="$PROJECT_DIR$/meme_ast/ast.py" />
+        <option value="$PROJECT_DIR$/meme_ast_printer/printer.py" />
+        <option value="$PROJECT_DIR$/meme_codegen/generate_code.py" />
+        <option value="$PROJECT_DIR$/meme_grammar/ebnf.txt" />
+        <option value="$PROJECT_DIR$/meme_grammar/bnf.txt" />
+        <option value="$PROJECT_DIR$/meme_lexer/lexer.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="154" />
-    <option name="y" value="61" />
+    <option name="x" value="525" />
+    <option name="y" value="38" />
     <option name="width" value="1401" />
     <option name="height" value="978" />
   </component>
@@ -188,22 +241,32 @@
             <path>
               <item name="MemeLanguage" type="b2602c69:ProjectViewProjectNode" />
               <item name="MemeLanguage" type="462c0819:PsiDirectoryNode" />
-              <item name="astPrinter" type="462c0819:PsiDirectoryNode" />
+              <item name="meme_ast" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MemeLanguage" type="b2602c69:ProjectViewProjectNode" />
               <item name="MemeLanguage" type="462c0819:PsiDirectoryNode" />
-              <item name="grammar" type="462c0819:PsiDirectoryNode" />
+              <item name="meme_ast_printer" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MemeLanguage" type="b2602c69:ProjectViewProjectNode" />
               <item name="MemeLanguage" type="462c0819:PsiDirectoryNode" />
-              <item name="lexer" type="462c0819:PsiDirectoryNode" />
+              <item name="meme_codegen" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MemeLanguage" type="b2602c69:ProjectViewProjectNode" />
               <item name="MemeLanguage" type="462c0819:PsiDirectoryNode" />
-              <item name="parser" type="462c0819:PsiDirectoryNode" />
+              <item name="meme_grammar" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MemeLanguage" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MemeLanguage" type="462c0819:PsiDirectoryNode" />
+              <item name="meme_lexer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MemeLanguage" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MemeLanguage" type="462c0819:PsiDirectoryNode" />
+              <item name="meme_parser" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -234,7 +297,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.lexer">
+  <component name="RunManager" selected="Python.main">
     <configuration name="lexer" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="MemeLanguage" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -249,6 +312,27 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="E:\GitHub\MemeLanguage\lexer\myLexer\lexer.py" />
       <option name="PARAMETERS" value="escargot" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="MemeLanguage" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -280,9 +364,11 @@
     <list>
       <item itemvalue="Python.parserv2" />
       <item itemvalue="Python.lexer" />
+      <item itemvalue="Python.main" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.lexer" />
       </list>
     </recent_temporary>
@@ -314,22 +400,41 @@
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="1" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="2" visible="true" weight="0.17913593" />
+      <window_info active="true" content_ui="combo" id="Project" order="2" visible="true" weight="0.17913593" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32938388" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3286334" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3991323" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.329718" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.30043384" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.329718" />
+      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.3275488" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.3286334" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+    <layout-to-restore>
+      <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="1" side_tool="true" />
+      <window_info active="true" content_ui="combo" id="Project" order="2" visible="true" weight="0.17913593" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3286334" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3991323" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.329718" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.329718" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32819906" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.3286334" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -367,46 +472,93 @@
     <entry file="file://$PROJECT_DIR$/lexer/myAstPrinter/astPrinter.py" />
     <entry file="file://$PROJECT_DIR$/lexer/myParser/parserv2.py" />
     <entry file="file://$PROJECT_DIR$/lexer/myLexer/operators.txt" />
-    <entry file="file://$PROJECT_DIR$/lexer/__init__.py">
+    <entry file="file://$PROJECT_DIR$/lexer/__init__.py" />
+    <entry file="file://$PROJECT_DIR$/parser/parser.py" />
+    <entry file="file://$PROJECT_DIR$/parser/__init__.py" />
+    <entry file="file://$PROJECT_DIR$/parser/ast.py" />
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/parser/parser.py">
+    <entry file="file://$PROJECT_DIR$/CodeGenerator/generate_code.py" />
+    <entry file="file://$PROJECT_DIR$/lexer/operators.txt" />
+    <entry file="file://$PROJECT_DIR$/lexer/lexer.py" />
+    <entry file="file://$PROJECT_DIR$/myparser/myast.py" />
+    <entry file="file://$PROJECT_DIR$/myparser/myparser.py" />
+    <entry file="file://$PROJECT_DIR$/astPrinter/astPrinter.py" />
+    <entry file="file://$PROJECT_DIR$/meme_lexer/keywords.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/meme_lexer/__init__.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/meme_grammar/bnf.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        <state>
+          <caret column="3" selection-start-column="3" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/meme_grammar/ebnf.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="4" selection-start-column="4" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/meme_codegen/instructions.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/meme_parser/parser.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/meme_lexer/operators.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/meme_ast/ast.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="504" column="31" selection-start-line="504" selection-start-column="31" selection-end-line="504" selection-end-column="31" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lexer/operators.txt">
-      <provider selected="true" editor-type-id="text-editor" />
+    <entry file="file://$PROJECT_DIR$/escargot.meme">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+        </state>
+      </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/parser/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
+    <entry file="file://$PROJECT_DIR$/meme_ast_printer/printer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        </state>
+      </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/parser/ast.py">
-      <provider selected="true" editor-type-id="text-editor" />
+    <entry file="file://$PROJECT_DIR$/meme_codegen/generate_code.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="24" column="1" selection-start-line="24" selection-start-column="1" selection-end-line="24" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/meme_lexer/lexer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="21" selection-start-column="21" selection-end-column="21" />
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/astPrinter/astPrinter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="39" selection-start-line="7" selection-start-column="39" selection-end-line="7" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lexer/lexer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="26" selection-start-line="2" selection-start-column="26" selection-end-line="2" selection-end-column="26" />
+        <state relative-caret-position="453">
+          <caret line="57" lean-forward="true" selection-start-line="57" selection-end-line="57" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

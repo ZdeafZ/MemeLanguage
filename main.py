@@ -1,17 +1,18 @@
-import lexer.lexer as lex
-from myparser.myparser import *
-import astPrinter.astPrinter as printer
+import meme_lexer.lexer as lex
+from meme_parser.parser import *
+from meme_ast.ast import getErrorFoundStatus
+import meme_ast_printer.printer as printer
 import sys
-import CodeGenerator.generate_code as CodeGen
+import meme_codegen.generate_code as code_gen
 try:
     with open("{}.meme".format(str(sys.argv[1])), "r") as file:
         string = file.read()
 except:
     print("File you are trying to lex was not found. Exiting")
     sys.exit()
-with open ("lexer/keywords.txt", "r") as file:
+with open ("meme_utils/keywords.dat", "r") as file:
     keywordList = file.read().split(",")
-with open ("lexer/operators.txt", "r") as file:
+with open ("meme_utils/operators.dat", "r") as file:
     operatorList = file.read().split(",")
 
 lexer = lex.Lexer(string, keywordList, operatorList)
@@ -40,7 +41,7 @@ try:
         if getErrorFoundStatus():
             result.check_main()
         if getErrorFoundStatus():
-            writer = CodeGen.CodeWriter()
+            writer = code_gen.CodeWriter()
             result.generate_code(writer)
             writer.dump()
 
@@ -52,6 +53,6 @@ except IndexError:
     root_scope = Scope()
     result.resolve_names(root_scope)
     result.check_types()
-    writer = CodeGen.CodeWriter()
+    writer = code_gen.CodeWriter()
     result.generate_code(writer)
 

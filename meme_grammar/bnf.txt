@@ -1,0 +1,219 @@
+BNF
+-----
+
+<digit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "0"
+<symbol> ::=  "|" | " " | "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | ">" | "=" | "<" | "?" | "@" | "[" | "\" | "]" | "^" | "_" | "`" | "{" | "}" | "~" | <newlines> | "" | "\"
+<letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+<newline> = <newlines>
+<newlines> = <newline> | <newlines><newline>
+<lit_char> ::= <letter> | <symbol> | <digit>
+<char> ::= "'"<lit_char>"'"
+<escape> ::= "~"
+<special> ::= """ | "n" | "t" | "\"
+<escape_seq> ::= <escape><special>
+<lit_stringchar> = <lit_char> | <escape_seq>
+<text> ::= <lit_stringchar> | <text> <lit_stringchar>
+<lit_string> = """ <text> """ | """ """
+
+<lit_int> ::= <digit> | <lit_int> <digit> | <digit> 
+<lit_float> ::= "-"<lit_int> | "-"<lit_int> "." <lit_int> | "-"<lit_int> "e" "-" <lit_int> | <lit_int> | <lit_int> "." <lit_int> | <lit_int> "e" "-" <lit_int>
+<lit_boolean> ::= "truth" | "lie"
+<type_qualifier> ::= "const"
+<type> ::= "nothing" | "integer" | "float" | "boolean" | "character" | "string"
+<constant> ::= <lit_char> | <lit_string> | <lit_float> | <lit_boolean> | <lit_int>
+<identifier> ::= <letter> | <identifier><lit_int> | <identifier>"_"<letter> | <identifier>"_"<lit_int> | <identifier> <letter>
+
+<primary_expression> ::= <constant> | <identifier> | <func_expression> | <priority_expression>
+<unary_expression> ::= <primary_expression> | "!" <primary_expression>
+<divmult_expression> ::= <unary_expression> | <divmult_expression> "/" <unary_expression> | <divmult_expression> "*" <unary_expression> | <divmult_expression> "%" <unary_expression>
+<addsubtr_expression> ::= <divmult_expression> | <addsubtr_expression> "+" <divmult_expression> | <addsubtr_expression> "-" <divmult_expression>
+<comparsion_expression> ::= <addsubtr_expression> | <comparsion_expression> <comparsion_signs> <addsubtr_expression>
+<logical_and_expression> ::= <comparsion_expression> | <logical_and_expression> "and" <comparsion_expression>
+<logical_or_expression> ::= <logical_and_expression> | <logical_or_expression> "or" <logical_and_expression>
+<expression> := <logical_or_expression>
+<priority_expression> ::= "(" <expression> ")"
+<arguments_list> ::= <expression> | <argument_expression>","<expression>
+<func_expression> ::= <identifier> "("<arguments_list>")"  | <identifier> "("")"
+
+
+<declaration_stmt> ::= <type_qualifier><type><identifier> | <type><identifier>
+<initialization_stmt> ::= <declaration_stmt> "->" <expression>
+
+<comparsion_signs> ::= "<" | ">" | "<=" | "=>" | "!=" | "==" 
+
+<if_stmt> ::= "if""(" <expression> ")" <newlines> "then" <stmts> <newlines> "end" <else_stmt> | "if""(" <expression> ")" <newlines> "then" <stmts> <newlines> "end" | "if""(" <expression> ")" <newlines> "then" <stmts> <newlines> "end" <elseif_stmts> | "if""(" <expression> ")" <newlines> "then" <stmts> <newlines> "end" <elseif_stmts> <else_stmt>
+<else_stmt> ::= "else" <newlines> "then" <stmts> <newlines> "end"
+<elseif_stmt> ::= "elseif" "("<expression>")" "then" <stmts>  <newlines> "end"
+<elseif_stmts> ::= <elseif_stmt> | <elseif_stmts> <elseif_stmt>
+
+<arguments> ::= <declaration_stmt> | <arguments>","<declaration_stmt> 
+
+<func_declaration_stmt> ::= "define" <type><identifier> "(" <arguments> ")" "[" <function_body> "]" | "define" <type><identifier> "("")" "[" <function_body> "]" | "define" <type><identifier> "("")" "[""]" |"define" <type><identifier> "("<arguments>")" "[""]"
+<functions>::= <func_declaration_stmt> | <functions> <newlines> <func_declaration_stmt>
+
+<assignment_stmt> ::= <identifier> "->" <expression>
+
+<jump_stmt> ::= "return" <expression> | "break" | "continue" | "return"
+
+<loop_stmt> ::= "while" "("<expression>")" "{"<stmts> <newlines> "end"
+
+<stmt> ::= <declaration_stmt> | <assignment_stmt> | <jump_stmt> | <if_stmt> | <loop_stmt> | <initialization_stmt>
+<stmts> ::= <stmt> <newlines> | <stmts><stmt> <newlines> 
+<function_body> ::= <stmts>
+
+<program>::= <functions> "FUNCTIONS END"<newlines> "MAIN START"<newlines> <stmts>
+
+<comment>::= "comment_start" <functions> "comment_end" | "comment_start" <stmts> "comment_end"
+
+---------------------
+
+<start> ::= <program>
+
+--------------------------
+PAVYZDYS:
+define nothing meme(integer x, integer y)
+[
+    if (x < y)
+    then
+        return nothing
+    end
+    elseif(x > y)
+    then
+        x -> y
+    end
+    else 
+        boolean check -> truth
+        while(truth)
+        {
+            x  = x - y
+            if(x = 0)
+            then
+                break
+            end
+            else
+            then
+                continue
+            end
+        }
+]
+define float meme2(float italiano)
+[
+    float italiano_2 -> italiano
+    return italiano_2 + 134e-14
+]
+define string meme3(string pastrami)
+[
+    string pastrami_exquisite_1 -> "plsescapethisnwhats up dude"
+    return pastrami_exquisite_1 + " meme"
+]
+define string meme4()
+[
+    return "this is a quality function"
+]
+FUNCTIONS END
+MAIN START
+integer x
+integer y -> 2*10/12*14-51-648*540+648*5400
+integer z
+float a
+string lol
+character char_in_1
+a -> meme(a)
+if(x < y and y == y or y <= y or y > z or z => x or z != x)
+then
+    x - > y
+    z - > z
+    comment start y - > z comment end
+end
+lol -> meme4()
+
+
+
+
+/-----------------------------------------------------------------------------------------
+define string meme3(string pastrami)
+[
+    string pastrami_exquisite_1 -> "plsescapethisnwhats up dude" + foo((a)) * truth < stuff
+    return pastrami_exquisite_1 + 1
+]
+<functions>
+<func_declaration_stmt>
+"define" <type><identifier> "(" <arguments> ")" "[" <function_body> "]"
+"define" "string" <identifier> "(" <arguments> ")" "[" <function_body> "]"
+"define" "string" (<identifier><lit_int>) "(" <arguments> ")" "[" <function_body> "]"
+"define" "string" ((<identifier><letter>)<lit_int>) "(" <arguments> ")" "[" <function_body> "]"
+"define" "string" (((<identifier><letter>)<letter>)<lit_int>) "(" <arguments> ")" "[" <function_body> "]"
+"define" "string" (((((m)e)m)e)3) "(" <arguments> ")" "[" <function_body> "]"
+"define" "string" (((((m)e)m)e)3) "(" <declaration_stmt> ")" "[" <function_body> "]"
+"define" "string" (((((m)e)m)e)3) "(" (<type><identifier>) ")" "[" <function_body> "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" <identifier>) ")" "[" <function_body> "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" (<identifier><letter>)) ")" "[" <function_body> "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" ((((((((p)a)s)t)r)a)m)i) ")" "[" <function_body> "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" ((((((((p)a)s)t)r)a)m)i) ")" "[" <stmts> "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" ((((((((p)a)s)t)r)a)m)i) ")" "[" (<stmts><stmt>) "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" ((((((((p)a)s)t)r)a)m)i) ")" "[" (<stmt><stmt>) "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" ((((((((p)a)s)t)r)a)m)i) ")" "[" (<initialization_stmt><stmt>) "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" ((((((((p)a)s)t)r)a)m)i) ")" "[" ((<declaration_stmt> "->" <expression>) <stmt>) "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" ((((((((p)a)s)t)r)a)m)i) ")" "[" (((<type><identifier>) "->" <expression>) <stmt>) "]"
+"define" "string" (((((m)e)m)e)3) "(" ("string" ((((((((p)a)s)t)r)a)m)i) ")" "[" ((("string" <identifier>) "->" <expression>) <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <logical_or_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <logical_and_expression>  <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <comparsion_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <comparsion_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <addsubtr_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <addsubtr_expression> "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <divmult_expression> "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <unary_expression> "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <primary_expression> "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <constant> "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" <lit_string> "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "<escape_seq>(<lit_stringchar>)*" "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "<escape><special>(<lit_stringchar>)*" "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisn(<lit_stringchar>)*" "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" <divmult_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" <divmult_expression> "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" <unary_expression> "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" <primary_expression> "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" <func_expression> "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" <identifier><"("arguments_list")"> "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<arguments_list>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<logical_or_expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<logical_and_expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<comparsion_expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<addsubtr_expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<divmult_expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<unary_expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<primary_expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo"("<priority_expression>")" "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((<expression>)) "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((<identifier>)) "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" <unary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" <primary_expression> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" <constant> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" <lit_boolean> "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" <addsubtr_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" <divmult_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" <unary_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" <primary_expression> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" <identifier> <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" <stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" <jump_stmt>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <logical_or_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <logical_and_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <comparsion_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <addsubtr_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <addsubtr_expression> "+" <divmult_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <divmult_expression> "+" <divmult_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <unary_expression> "+" <divmult_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <primary_expression> "+" <divmult_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" <identifier> "+" <divmult_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" "pastrami_exquisite_1" "+" <divmult_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" "pastrami_exquisite_1" "+" <unary_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" "pastrami_exquisite_1" "+" <primary_expression>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" "pastrami_exquisite_1" "+" <constant>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" "pastrami_exquisite_1" "+" <lit_int>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" "pastrami_exquisite_1" "+" <digit>) "]"
+"define" "string" meme3 "(" ("string" pastrami ")" "[" "string" pastrami_exquisite_1 "->" "plsescapethisnwhats up dude" "+" foo((a)) "*" "truth" "<" "stuff" "return" "pastrami_exquisite_1" "+" "1") "]"
