@@ -2,7 +2,10 @@ define nothing main()
 [
     integer a -> 5
     integer b -> 6
-    if(a < b)
-    then
-    end
+    integer c -> 7
+    integer d -> add()
+]
+define integer add()
+[
+    integer a -> 5
 ]

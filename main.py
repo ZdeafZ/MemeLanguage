@@ -1,6 +1,6 @@
 import meme_lexer.lexer as lex
-from meme_parser.parser import *
-from meme_ast.ast import getErrorFoundStatus
+import meme_parser.parser as parse
+import meme_ast.ast as ast
 import meme_ast_printer.printer as printer
 import sys
 import meme_codegen.generate_code as code_gen
@@ -17,7 +17,7 @@ with open ("meme_utils/operators.dat", "r") as file:
 
 lexer = lex.Lexer(string, keywordList, operatorList)
 lexer.run()
-parser = Parser(lexer.tokenList)
+parser = parse.Parser(lexer.tokenList)
 result = parser.parse_functions()
 printer = printer.ASTPrinter()
 
@@ -27,20 +27,20 @@ try:
     elif str(sys.argv[2]) == "parse":
         result.print(printer)
     elif str(sys.argv[2]) == "resolve":
-        root_scope = Scope()
+        root_scope = parse.Scope()
         result.resolve_names(root_scope)
     elif str(sys.argv[2]) == "check_types":
-        root_scope = Scope()
+        root_scope = parse.Scope()
         result.resolve_names(root_scope)
         result.check_types()
     elif str(sys.argv[2] == "generate_code"):
-        root_scope = Scope()
+        root_scope = parse.Scope()
         result.resolve_names(root_scope)
-        if getErrorFoundStatus():
+        if ast.get_error_found_status():
             result.check_types()
-        if getErrorFoundStatus():
+        if ast.get_error_found_status():
             result.check_main()
-        if getErrorFoundStatus():
+        if ast.get_error_found_status():
             writer = code_gen.CodeWriter()
             result.generate_code(writer)
             writer.dump()
@@ -50,7 +50,7 @@ try:
 except IndexError:
     lexer.printTokens()
     result.print(printer)
-    root_scope = Scope()
+    root_scope = parse.Scope()
     result.resolve_names(root_scope)
     result.check_types()
     writer = code_gen.CodeWriter()

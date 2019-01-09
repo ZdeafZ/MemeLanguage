@@ -22,7 +22,7 @@ class CodeWriter:
             opcode = self.code[offset]
             instr_descr = instructions_by_opcode[opcode]
             ops = self.code[offset + 1: offset + 1 + instr_descr.op_count]
-            print("{:<5} {:10} {}".format(offset,instr_descr.name,ops))
+            print("{:<5} {:10} {}".format(offset, instr_descr.name, ops))
             offset += 1 + instr_descr.op_count
 
     def write(self,instr,*ops):
@@ -32,11 +32,11 @@ class CodeWriter:
             print("bullshit operand count")
         self.code.append(instr_descr.opcode)
         for op in ops:
-            if not isinstance(op,Label):
+            if not isinstance(op, Label):
                 self.code.append(op)
             elif op.value is None:
                 op.offsets.append(len(self.code))
-                self.code.append(123123)
+                self.code.append(696969)
             else:
                 self.code.append(op.value)
 

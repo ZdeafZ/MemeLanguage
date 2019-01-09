@@ -1,4 +1,5 @@
-from meme_parser.parser import Token
+import meme_parser.parser as parser
+
 
 class ASTPrinter:
     def __init__(self):
@@ -6,8 +7,8 @@ class ASTPrinter:
         
     def print(self,name,value):
         if type(value) is list:
-            self.printArray(name,value)
-        elif type(value) is Token:
+            self.print_array(name, value)
+        elif type(value) is parser.Token:
             print("    "*self.indent + "{}  {}  {}".format(name, value.type, value.value))
         elif value is None:
             pass
@@ -19,7 +20,7 @@ class ASTPrinter:
             value.print(self)
             self.indent -= 1
 
-    def printArray(self,name,value):
+    def print_array(self, name, value):
         counter = 0
         for x in value:
             self.print(name+" [{}]".format(counter), x)
