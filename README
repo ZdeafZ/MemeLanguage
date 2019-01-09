@@ -5,8 +5,12 @@ python main.py filename [args] (file extension must be .meme, theres an example 
 args = lex, parse, resolve, check_types, generate_code
   lex - displays only the lexed token list.
   parse - displays only the Abstract Syntax Tree.
-  resolve - resolves names, find duplicates or non-declared ones
+  resolve - resolves names, finds duplicates or non-declared ones
   check_types - resolves names, and checks whether types match.
   generate_code - generates binary and textual form of machine code
   no args - does everything.
 BNF and eBNF stores the grammar.
+For running it, you can use three provided batch files.
+_lex.bat
+_parse.bat
+_generate_code.bat
