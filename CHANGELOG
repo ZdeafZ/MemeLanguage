@@ -1,5 +1,7 @@
-[2019/01/09]:	Fixed dependencies (Stopped using from x import y statements).
-				Refactored project structure. (Most folders and functions have the same style now).
-				Added seperation for temporary variables and local variables.
-				Fixed minor bugs regarding Binary Expressions.
+[2019/01/09]:
+Added changelog.
+Fixed dependencies (Stopped using from x import y statements).
+Refactored project structure. (Most folders and functions have the same style now).
+Added seperation for temporary variables and local variables.
+Fixed minor bugs regarding Binary Expressions.
 				
