@@ -10,7 +10,7 @@ args = lex, parse, resolve, check_types, generate_code
   generate_code - generates binary and textual form of machine code
   no args - does everything.
 BNF and eBNF stores the grammar.
-For running it, you can use three provided batch files.
-_lex.bat
-_parse.bat
-_generate_code.bat
+For running it, you can use three provided batch files that take a filename for an argument
+_lex.bat filename
+_parse.bat filename
+_generate_code.bat filename
