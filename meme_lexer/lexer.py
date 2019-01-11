@@ -27,11 +27,12 @@ class Lexer:
         self.tempString = ""
     tokenList = []
     escapeSeq = {"~n" : "\n", "~t" : "\t", "~\"" : "\""}
+
     def printTokens(self):
         print("|       {:22}       |        {:15}       |  {:5}  |".format("TYPE", "VALUE","LINE"))
         print("-------------------------------------------------------------------------------".format("TYPE", "VALUE", "LINE"))
-        for parser.Token in self.tokenList:
-            parser.Token.print()
+        for token in self.tokenList:
+            token.print()
 
     def isEof(self):
         if self.position == self.getLenght():

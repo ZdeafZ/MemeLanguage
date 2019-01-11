@@ -9,6 +9,7 @@ class ASTPrinter:
         if type(value) is list:
             self.print_array(name, value)
         elif type(value) is parser.Token:
+
             print("    "*self.indent + "{}  {}  {}".format(name, value.type, value.value))
         elif value is None:
             pass

@@ -9,8 +9,8 @@ instructions_by_name = {}
 instructions_by_opcode = {}
 
 
-def add_instruction(name,opcode,op_count):
-    instruction = Instruction(name,opcode,op_count)
+def add_instruction(name, opcode, op_count):
+    instruction = Instruction(name, opcode, op_count)
     instructions_by_name[name] = instruction
     instructions_by_opcode[opcode] = instruction
 
@@ -40,3 +40,4 @@ add_instruction("RET_V", 0x32, 0)
 add_instruction("BR", 0x33,  1)
 add_instruction("BZ", 0x34,  1)
 add_instruction("ALLOC", 0x35, 1)
+add_instruction("EXIT", 0x36, 0)

@@ -286,8 +286,15 @@ class Functions(Node):
         global mainIndex
         if mainIndex == -1:
             sys.exit()
+        counter = 0
         for function in self.functions:
+            if counter == mainIndex:
+                w.write("PUSH",function.entry_label)
+                w.write("CALL",len(function.params))
             function.generate_code(w)
+            if counter == mainIndex:
+                w.write("EXIT")
+            counter += 1
             
     def check_main(self):
         global mainIndex
