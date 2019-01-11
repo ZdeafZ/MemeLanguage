@@ -45,7 +45,8 @@ class VirtualMachine:
     def execute_one(self):
 
         opcode = self.read_immediate()
-        print(opcode)
+        
+        #print("ip: {}   {}".format( self.ip-1 , instructions.instructions_by_opcode[opcode].name))
         if opcode == 0x10:
             b = self.pop()
             a = self.pop()
@@ -78,22 +79,6 @@ class VirtualMachine:
             b = self.pop()
             a = self.pop()
             if a >= b:
-                self.push(1)
-            else:
-                self.push(0)
-
-        elif opcode == 0x16:
-            b = self.pop()
-            a = self.pop()
-            if a < b:
-                self.push(1)
-            else:
-                self.push(0)
-
-        elif opcode == 0x17:
-            b = self.pop()
-            a = self.pop()
-            if a <= b:
                 self.push(1)
             else:
                 self.push(0)
@@ -192,7 +177,10 @@ class VirtualMachine:
 
         elif opcode == 0x36:
             self.running = False
-
+        
+        elif opcode == 0x37:
+            print(self.pop())
+            
     def pop(self):
         self.sp -= 1
         return self.memory[self.sp]

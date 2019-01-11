@@ -1,4 +1,19 @@
-define nothing main()
+define integer main()
 [
-    integer a -> 10
+    
+    return fib(10)
+]
+define integer fib(integer n)
+[
+    integer a -> 0
+    integer b -> 1
+    integer c -> 0
+    while (n > 0)
+    then
+        c = a + b
+        a = b
+        b = c
+        n = n - 1 
+    end
+    return a
 ]

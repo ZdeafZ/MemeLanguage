@@ -291,11 +291,11 @@ class Functions(Node):
             if counter == mainIndex:
                 w.write("PUSH_DUM",function.entry_label)
                 w.write("CALL",len(function.params))
+                w.write("PRNT") 
+                w.write("EXIT")
             function.generate_code(w)
             if counter == mainIndex:
-                w.write("PRNT", 500)
-                w.write("EXIT")
-            counter += 1
+                counter += 1
             
     def check_main(self):
         global mainIndex
@@ -303,7 +303,7 @@ class Functions(Node):
         counter = 0
         for function in self.functions:
             if function.name.value == "main":
-                if unify_types(function.type,TypeNothing(None)):
+                if unify_types(function.type,TypeInt(None)):
                     if len(function.params) == 0: 
                         mainIndex = counter
                         break
@@ -383,7 +383,8 @@ class Expr(Node):
         return self.expr.check_types()
 
     def generate_code(self, w):
-        self.expr.generate_code(w)
+        if self.expr is not None:
+            self.expr.generate_code(w)
 
 
 class ExprPriority(Expr):
@@ -490,6 +491,7 @@ class Branch(Stmt):
         self.body = body
         self.add_children(self.body)
         self.parent = parent
+        self.last = False
 
     def print(self,p):
         p.print("Cond",self.cond)
@@ -510,7 +512,10 @@ class Branch(Stmt):
         self.cond.generate_code(w)
         w.write("BZ", self.end_label)
         self.body.generate_code(w)
-        w.write("BR", self.parent.final_label)
+        if self.last == True and self.parent.body is None:
+            pass
+        else:
+            w.write("BR", self.parent.final_label)
         w.place_label(self.end_label)
 
 class StmtBlock(Stmt):
@@ -557,9 +562,8 @@ class StmtExpr(Stmt):
             return self.expr.check_types()
 
     def generate_code(self, w):
-        self.expr.generate_code(w)
-        if type(self.expr) is ExprConstant:
-            w.write("POP")
+        if self.expr is not None:
+            self.expr.generate_code(w)
 
 
 class StmtReturn(Stmt):
@@ -637,11 +641,12 @@ class StmtIf(Stmt):
     def generate_code(self, w):
         self.final_label = w.new_label()
         for branch in self.branches:
+            if branch == self.branches[len(self.branches)-1]:
+                branch.last = True
             branch.generate_code(w)
         if self.body is not None:
-            w.write("BR", self.final_label)
-            w.place_label(self.final_label)
             self.body.generate_code(w)
+            w.place_label(self.final_label)
         else:
             w.place_label(self.final_label)
 
