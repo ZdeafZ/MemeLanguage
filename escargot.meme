@@ -1,4 +1,4 @@
 define nothing main()
 [
-    integer a -> 5
+    integer a -> 10
 ]

@@ -289,10 +289,11 @@ class Functions(Node):
         counter = 0
         for function in self.functions:
             if counter == mainIndex:
-                w.write("PUSH",function.entry_label)
+                w.write("PUSH_DUM",function.entry_label)
                 w.write("CALL",len(function.params))
             function.generate_code(w)
             if counter == mainIndex:
+                w.write("PRNT", 500)
                 w.write("EXIT")
             counter += 1
             
@@ -974,9 +975,9 @@ class ExprCall(Expr):
 
     def generate_code(self, w):
         if hasattr(self.target,"entry_label"):
-            w.write("PUSH", self.target.entry_label)
+            w.write("PUSH_DUM", self.target.entry_label)
         else:
-            w.write("PUSH", -1)
+            w.write("PUSH_DUM", -1)
 
         for arg in self.args:
             arg.generate_code(w)

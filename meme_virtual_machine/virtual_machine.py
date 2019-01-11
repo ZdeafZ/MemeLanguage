@@ -1,4 +1,5 @@
 import meme_codegen.instructions as instructions
+import sys
 
 
 class VirtualMachine:
@@ -19,8 +20,10 @@ class VirtualMachine:
             self.execute_one()
 
     def execute_call(self, args):
+
         self.sp -= args
         target = self.memory[self.sp - 3] + self.code_base
+
         self.memory[self.sp - 3] = self.ip
         self.memory[self.sp - 2] = self.fp
         self.memory[self.sp - 1] = self.sp - 3
@@ -28,6 +31,7 @@ class VirtualMachine:
         self.fp = self.sp
 
     def execute_ret(self, value):
+
         old_ip = self.memory[self.fp - 3]
         old_fp = self.memory[self.fp - 2]
         old_sp = self.memory[self.fp - 1]
@@ -39,11 +43,9 @@ class VirtualMachine:
         self.push(value)
 
     def execute_one(self):
+
         opcode = self.read_immediate()
         print(opcode)
-        print("ip: {}".format(self.ip-1))
-        print("fp: {}".format(self.fp))
-        print("sp: {}".format(self.sp))
         if opcode == 0x10:
             b = self.pop()
             a = self.pop()
@@ -158,6 +160,13 @@ class VirtualMachine:
         elif opcode == 0x43:
             value = self.read_immediate()
             self.push(value)
+
+        elif opcode == 0x44:
+            dummy = 2332
+            value = self.read_immediate()
+            self.push(value)
+            self.push(dummy)
+            self.push(dummy)
 
         elif opcode == 0x30:
             self.execute_call(self.read_immediate())
